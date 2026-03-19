@@ -571,6 +571,7 @@
     paletteIdx = 0;
     grist.setOption('groupBy', groupBy);
     render();
+    if (settingsPanel.classList.contains('open')) refreshColorGrid();
   });
 
   sortSelect.addEventListener('change', () => {
