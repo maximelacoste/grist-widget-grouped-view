@@ -26,7 +26,14 @@
       --mono:         'IBM Plex Mono', monospace;
     }
 
-    html, body {
+    html {
+      height: 100%;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
       height: 100%;
       overflow: hidden;
       margin: 0;
@@ -34,8 +41,11 @@
       background: var(--bg);
     }
 
+    /* position:absolute inset:0 — le seul layout fiable dans une iframe Grist
+       qui redimensionne dynamiquement son contenu */
     #app {
-      height: 100%;
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
       display: flex;
       flex-direction: column;
       overflow: hidden;
