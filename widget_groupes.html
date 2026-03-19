@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vue groupée</title>
+  <title>Vue groupée — Grist widget</title>
   <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
@@ -17,14 +17,16 @@
       --text:         #18181b;
       --muted:        #71717a;
       --accent:       #2563eb;
-      --accent-bg:    #eff6ff;
       --group-stripe: #fafaf9;
       --hover-row:    #f0f6ff;
+      --focus-ring:   0 0 0 2px rgba(37,99,235,0.35);
       --radius:       5px;
       --shadow:       0 1px 2px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04);
       --font:         'IBM Plex Sans', system-ui, sans-serif;
       --mono:         'IBM Plex Mono', monospace;
     }
+
+    html, body { height: 100%; }
 
     body {
       font-family: var(--font);
@@ -32,7 +34,6 @@
       color: var(--text);
       font-size: 13px;
       line-height: 1.5;
-      height: 100vh;
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -47,16 +48,20 @@
       background: var(--surface);
       border-bottom: 1px solid var(--border);
       flex-shrink: 0;
+      flex-wrap: wrap;
       min-height: 36px;
     }
 
-    .toolbar-label {
+    .toolbar-group { display: flex; align-items: center; gap: 5px; }
+
+    .toolbar label {
       font-size: 11px;
       font-weight: 600;
       letter-spacing: 0.04em;
       text-transform: uppercase;
       color: var(--muted);
       white-space: nowrap;
+      cursor: default;
     }
 
     .toolbar select {
@@ -71,9 +76,9 @@
       outline: none;
       max-width: 180px;
     }
-    .toolbar select:focus {
+    .toolbar select:focus-visible {
       border-color: var(--accent);
-      box-shadow: 0 0 0 2px rgba(37,99,235,0.14);
+      box-shadow: var(--focus-ring);
     }
 
     .toolbar-sep {
@@ -97,9 +102,11 @@
       cursor: pointer;
       white-space: nowrap;
       transition: background 0.1s, color 0.1s, border-color 0.1s;
+      outline: none;
     }
     .btn:hover { background: var(--bg); color: var(--text); border-color: var(--muted); }
     .btn:active { background: #e4e4e2; }
+    .btn:focus-visible { box-shadow: var(--focus-ring); border-color: var(--accent); }
 
     /* ── Stats bar ── */
     .statsbar {
@@ -114,20 +121,34 @@
       color: var(--muted);
     }
     .statsbar.visible { display: flex; }
-    .stat-val { font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; }
+    .stat-val {
+      font-weight: 600;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+    }
 
-    /* ── Content area ── */
+    /* ── Zone de contenu avec ascenseur permanent ── */
     .content {
       flex: 1;
-      overflow-y: auto;
+      overflow-y: scroll;          /* ascenseur toujours visible */
+      scrollbar-gutter: stable;    /* réserve l'espace même vide */
       padding: 8px 10px;
       display: flex;
       flex-direction: column;
       gap: 5px;
+      /* Firefox */
+      scrollbar-width: thin;
+      scrollbar-color: var(--border-strong) var(--bg);
     }
-    .content::-webkit-scrollbar { width: 5px; }
-    .content::-webkit-scrollbar-track { background: transparent; }
-    .content::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+    /* Chromium / Safari */
+    .content::-webkit-scrollbar        { width: 8px; }
+    .content::-webkit-scrollbar-track  { background: var(--bg); border-radius: 4px; }
+    .content::-webkit-scrollbar-thumb  {
+      background: var(--border-strong);
+      border-radius: 4px;
+      border: 2px solid var(--bg);
+    }
+    .content::-webkit-scrollbar-thumb:hover { background: var(--muted); }
 
     /* ── Empty state ── */
     .empty {
@@ -141,11 +162,11 @@
       text-align: center;
       padding: 20px;
     }
-    .empty svg { opacity: 0.25; }
-    .empty-title { font-size: 13px; font-weight: 500; color: var(--text); }
-    .empty-sub { font-size: 12px; }
+    .empty svg      { opacity: 0.25; }
+    .empty-title    { font-size: 13px; font-weight: 500; color: var(--text); }
+    .empty-sub      { font-size: 12px; }
 
-    /* ── Group card ── */
+    /* ── Groupe ── */
     .group {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -154,20 +175,29 @@
       box-shadow: var(--shadow);
     }
 
+    /* En-tête : <button> natif = clavier + lecteur d'écran OK */
     .group-header {
       display: flex;
       align-items: center;
       gap: 7px;
       padding: 6px 10px;
+      width: 100%;
+      text-align: left;
+      background: none;
+      border: none;
       cursor: pointer;
+      font-family: var(--font);
+      font-size: 13px;
+      color: var(--text);
       user-select: none;
       transition: background 0.1s;
+      outline: none;
     }
-    .group-header:hover { background: var(--bg); }
+    .group-header:hover        { background: var(--bg); }
+    .group-header:focus-visible { box-shadow: inset 0 0 0 2px var(--accent); }
 
     .chevron {
-      width: 14px;
-      height: 14px;
+      width: 14px; height: 14px;
       flex-shrink: 0;
       color: var(--muted);
       transition: transform 0.2s cubic-bezier(0.4,0,0.2,1);
@@ -175,8 +205,7 @@
     .group.collapsed .chevron { transform: rotate(-90deg); }
 
     .group-dot {
-      width: 8px;
-      height: 8px;
+      width: 8px; height: 8px;
       border-radius: 50%;
       flex-shrink: 0;
     }
@@ -208,7 +237,7 @@
       flex-shrink: 0;
     }
 
-    /* ── Group body / table ── */
+    /* Corps accordéon */
     .group-body {
       display: grid;
       grid-template-rows: 1fr;
@@ -221,12 +250,22 @@
     }
     .group-body-inner { overflow: hidden; }
 
+    /* ── Tableau ── */
     .rec-table {
       width: 100%;
       border-collapse: collapse;
       font-size: 12px;
     }
-
+    /* Caption masquée visuellement, lisible par les lecteurs d'écran */
+    .rec-table caption {
+      position: absolute;
+      width: 1px; height: 1px;
+      padding: 0; margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+      border: 0;
+    }
     .rec-table thead th {
       font-family: var(--mono);
       font-size: 10px;
@@ -242,9 +281,8 @@
       text-overflow: ellipsis;
       max-width: 160px;
     }
-
-    .rec-table tbody tr { transition: background 0.08s; }
-    .rec-table tbody tr:hover td { background: var(--hover-row); }
+    .rec-table tbody tr           { transition: background 0.08s; }
+    .rec-table tbody tr:hover td  { background: var(--hover-row); }
     .rec-table tbody td {
       padding: 5px 10px;
       border-bottom: 1px solid var(--border);
@@ -256,80 +294,78 @@
     }
     .rec-table tbody tr:last-child td { border-bottom: none; }
 
-    .cell-null { color: var(--muted); font-style: italic; font-size: 11px; }
+    .cell-null   { color: var(--muted); font-style: italic; font-size: 11px; }
     .cell-bool-t { color: #16a34a; font-weight: 500; }
     .cell-bool-f { color: #dc2626; }
-    .cell-num { font-family: var(--mono); font-size: 11px; }
+    .cell-num    { font-family: var(--mono); font-size: 11px; }
 
-    /* ── Only-one-col note ── */
     .only-group-col {
       padding: 8px 12px;
       font-size: 11px;
       color: var(--muted);
       font-style: italic;
     }
-
-    /* ── Sort toggle ── */
-    #sort-select {
-      font-family: var(--font);
-      font-size: 11px;
-      padding: 2px 5px;
-      border: 1px solid var(--border-strong);
-      border-radius: var(--radius);
-      background: var(--surface);
-      color: var(--muted);
-      cursor: pointer;
-      outline: none;
-    }
-    #sort-select:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(37,99,235,0.14); }
   </style>
 </head>
 <body>
 
-<div class="toolbar">
-  <span class="toolbar-label">Grouper par</span>
-  <select id="group-select">
-    <option value="">— choisir —</option>
-  </select>
-  <div class="toolbar-sep"></div>
-  <span class="toolbar-label">Tri</span>
-  <select id="sort-select">
-    <option value="alpha-asc">A → Z</option>
-    <option value="alpha-desc">Z → A</option>
-    <option value="count-desc">Nb ↓</option>
-    <option value="count-asc">Nb ↑</option>
-  </select>
-  <div class="toolbar-right">
-    <button class="btn" id="btn-expand">Tout déplier</button>
-    <button class="btn" id="btn-collapse">Tout plier</button>
-  </div>
-</div>
+<header class="toolbar" role="toolbar" aria-label="Options de groupement">
 
-<div class="statsbar" id="statsbar">
+  <div class="toolbar-group">
+    <label for="group-select">Grouper par</label>
+    <select id="group-select">
+      <option value="">— choisir —</option>
+    </select>
+  </div>
+
+  <div class="toolbar-sep" role="separator" aria-orientation="vertical"></div>
+
+  <div class="toolbar-group">
+    <label for="sort-select">Tri</label>
+    <select id="sort-select">
+      <option value="alpha-asc">A → Z</option>
+      <option value="alpha-desc">Z → A</option>
+      <option value="count-desc">Nb ↓</option>
+      <option value="count-asc">Nb ↑</option>
+    </select>
+  </div>
+
+  <div class="toolbar-right">
+    <button class="btn" id="btn-expand"   type="button">Tout déplier</button>
+    <button class="btn" id="btn-collapse" type="button">Tout plier</button>
+  </div>
+
+</header>
+
+<div class="statsbar" id="statsbar" role="status" aria-live="polite" aria-atomic="true">
   <span><span class="stat-val" id="stat-groups">0</span> groupes</span>
-  <span>·</span>
+  <span aria-hidden="true">·</span>
   <span><span class="stat-val" id="stat-records">0</span> enregistrements</span>
 </div>
 
-<div class="content" id="content">
-  <div class="empty" id="empty-state">
-    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+<main class="content" id="content" aria-label="Groupes d'enregistrements">
+
+  <div class="empty" id="empty-state" role="status">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+         stroke="currentColor" stroke-width="1.2"
+         aria-hidden="true" focusable="false">
       <rect x="3" y="3" width="18" height="18" rx="2.5"/>
       <path d="M3 9h18M9 21V9"/>
     </svg>
-    <div class="empty-title">Aucune colonne sélectionnée</div>
-    <div class="empty-sub">Choisis une colonne dans la barre ci-dessus<br>pour grouper les enregistrements.</div>
+    <p class="empty-title">Aucune colonne sélectionnée</p>
+    <p class="empty-sub">Choisis une colonne dans la barre ci-dessus<br>pour grouper les enregistrements.</p>
   </div>
-</div>
+
+</main>
 
 <script>
-  // ── State ──────────────────────────────────────────────
+  // ── État ───────────────────────────────────────────────
   let allRecords = [];
   let allColumns = [];
   let groupBy    = '';
   let sortMode   = 'alpha-asc';
-  let collapsed  = new Set();   // set of group keys currently collapsed
-  let colColors  = {};          // stable colors per group key
+  let collapsed  = new Set();
+  let colColors  = {};
 
   const PALETTE = [
     '#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6',
@@ -337,7 +373,7 @@
   ];
   let paletteIdx = 0;
 
-  // ── DOM refs ───────────────────────────────────────────
+  // ── Refs DOM ───────────────────────────────────────────
   const groupSelect = document.getElementById('group-select');
   const sortSelect  = document.getElementById('sort-select');
   const content     = document.getElementById('content');
@@ -346,19 +382,13 @@
   const statRecords = document.getElementById('stat-records');
   const emptyState  = document.getElementById('empty-state');
 
-  // ── Grist ─────────────────────────────────────────────
+  // ── Grist ──────────────────────────────────────────────
   grist.ready({ requiredAccess: 'read table' });
 
   grist.onOptions((opts) => {
     if (!opts) return;
-    if (opts.groupBy) {
-      groupBy = opts.groupBy;
-      groupSelect.value = groupBy;
-    }
-    if (opts.sortMode) {
-      sortMode = opts.sortMode;
-      sortSelect.value = sortMode;
-    }
+    if (opts.groupBy)  { groupBy  = opts.groupBy;  groupSelect.value = groupBy;  }
+    if (opts.sortMode) { sortMode = opts.sortMode; sortSelect.value  = sortMode; }
     render();
   });
 
@@ -372,7 +402,7 @@
     render();
   });
 
-  // ── Column select ──────────────────────────────────────
+  // ── Sélecteur de colonne ───────────────────────────────
   function rebuildColumnSelect() {
     const prev = groupSelect.value;
     groupSelect.innerHTML = '<option value="">— choisir —</option>';
@@ -387,7 +417,7 @@
   }
 
   groupSelect.addEventListener('change', () => {
-    groupBy = groupSelect.value;
+    groupBy    = groupSelect.value;
     collapsed.clear();
     colColors  = {};
     paletteIdx = 0;
@@ -403,15 +433,21 @@
 
   document.getElementById('btn-expand').addEventListener('click', () => {
     collapsed.clear();
-    document.querySelectorAll('.group.collapsed').forEach(el => el.classList.remove('collapsed'));
+    document.querySelectorAll('.group.collapsed').forEach(el => {
+      el.classList.remove('collapsed');
+      el.querySelector('.group-header').setAttribute('aria-expanded', 'true');
+    });
   });
 
   document.getElementById('btn-collapse').addEventListener('click', () => {
     getGroups().forEach(g => collapsed.add(g.key));
-    document.querySelectorAll('.group:not(.collapsed)').forEach(el => el.classList.add('collapsed'));
+    document.querySelectorAll('.group:not(.collapsed)').forEach(el => {
+      el.classList.add('collapsed');
+      el.querySelector('.group-header').setAttribute('aria-expanded', 'false');
+    });
   });
 
-  // ── Grouping logic ─────────────────────────────────────
+  // ── Groupement ─────────────────────────────────────────
   function getGroups() {
     if (!groupBy) return [];
     const map = new Map();
@@ -423,11 +459,8 @@
     });
     let groups = Array.from(map.values());
 
-    // Ensure stable colors
     groups.forEach(g => {
-      if (!colColors[g.key]) {
-        colColors[g.key] = PALETTE[paletteIdx++ % PALETTE.length];
-      }
+      if (!colColors[g.key]) colColors[g.key] = PALETTE[paletteIdx++ % PALETTE.length];
     });
 
     groups.sort((a, b) => {
@@ -442,9 +475,8 @@
     return groups;
   }
 
-  // ── Render ─────────────────────────────────────────────
+  // ── Rendu ──────────────────────────────────────────────
   function render() {
-    // Clear non-empty-state children
     Array.from(content.children).forEach(c => {
       if (c.id !== 'empty-state') c.remove();
     });
@@ -453,16 +485,16 @@
       emptyState.style.display = '';
       emptyState.querySelector('.empty-title').textContent =
         !groupBy ? 'Aucune colonne sélectionnée' : 'Aucun enregistrement';
-      emptyState.querySelector('.empty-sub').textContent =
+      emptyState.querySelector('.empty-sub').innerHTML =
         !groupBy
-          ? 'Choisis une colonne dans la barre ci-dessus\npour grouper les enregistrements.'
+          ? 'Choisis une colonne dans la barre ci-dessus<br>pour grouper les enregistrements.'
           : 'La table sélectionnée ne contient aucun enregistrement.';
       statsbar.classList.remove('visible');
       return;
     }
 
     emptyState.style.display = 'none';
-    const groups    = getGroups();
+    const groups      = getGroups();
     const displayCols = allColumns.filter(c => c !== groupBy);
 
     statsbar.classList.add('visible');
@@ -470,64 +502,88 @@
     statRecords.textContent = allRecords.length;
 
     groups.forEach(group => {
-      const card = document.createElement('div');
-      card.className = 'group' + (collapsed.has(group.key) ? ' collapsed' : '');
+      const isCollapsed = collapsed.has(group.key);
+      const isEmpty     = group.key === '\x00__empty__';
+      const dotColor    = colColors[group.key] || '#94a3b8';
+      const labelTxt    = isEmpty ? '(vide)' : esc(String(group.label));
+      const labelCls    = isEmpty ? 'group-label is-empty' : 'group-label';
+      const bodyId      = 'grp-' + btoa(encodeURIComponent(group.key)).replace(/[^a-zA-Z0-9]/g,'');
 
-      const isEmpty  = group.key === '\x00__empty__';
-      const dotColor = colColors[group.key] || '#94a3b8';
-      const labelCls = isEmpty ? 'group-label is-empty' : 'group-label';
-      const labelTxt = isEmpty ? '(vide)' : esc(String(group.label));
+      // Carte du groupe
+      const card = document.createElement('article');
+      card.className = 'group' + (isCollapsed ? ' collapsed' : '');
 
-      card.innerHTML = `
-        <div class="group-header">
-          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="6 9 12 15 18 9"/>
-          </svg>
-          <span class="group-dot" style="background:${dotColor}"></span>
-          <span class="${labelCls}">${labelTxt}</span>
-          <span class="group-badge">${group.records.length}</span>
-        </div>
-        <div class="group-body">
-          <div class="group-body-inner">
-            ${displayCols.length === 0
-              ? `<div class="only-group-col">Aucune autre colonne à afficher.</div>`
-              : buildTable(displayCols, group.records)
-            }
-          </div>
-        </div>`;
+      // En-tête — <button> pour navigation clavier native
+      const header = document.createElement('button');
+      header.type = 'button';
+      header.className = 'group-header';
+      header.setAttribute('aria-expanded', String(!isCollapsed));
+      header.setAttribute('aria-controls', bodyId);
+      header.innerHTML = `
+        <svg class="chevron" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2.5"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true" focusable="false">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+        <span class="group-dot" style="background:${dotColor}" aria-hidden="true"></span>
+        <span class="${labelCls}">${labelTxt}</span>
+        <span class="group-badge"
+              aria-label="${group.records.length} enregistrement${group.records.length > 1 ? 's' : ''}">${group.records.length}</span>`;
 
-      card.querySelector('.group-header').addEventListener('click', () => {
+      header.addEventListener('click', () => {
         if (collapsed.has(group.key)) {
           collapsed.delete(group.key);
           card.classList.remove('collapsed');
+          header.setAttribute('aria-expanded', 'true');
         } else {
           collapsed.add(group.key);
           card.classList.add('collapsed');
+          header.setAttribute('aria-expanded', 'false');
         }
       });
 
+      // Corps
+      const body = document.createElement('div');
+      body.className = 'group-body';
+      body.id = bodyId;
+      body.setAttribute('role', 'region');
+      body.setAttribute('aria-label', 'Enregistrements — ' + labelTxt);
+
+      const inner = document.createElement('div');
+      inner.className = 'group-body-inner';
+      inner.innerHTML = displayCols.length === 0
+        ? '<p class="only-group-col">Aucune autre colonne à afficher.</p>'
+        : buildTable(displayCols, group.records, labelTxt);
+
+      body.appendChild(inner);
+      card.appendChild(header);
+      card.appendChild(body);
       content.appendChild(card);
     });
   }
 
-  function buildTable(cols, records) {
+  function buildTable(cols, records, groupLabel) {
     const thead = cols.map(c =>
-      `<th title="${esc(c)}">${esc(c)}</th>`
+      `<th scope="col" title="${esc(c)}">${esc(c)}</th>`
     ).join('');
     const tbody = records.map(rec =>
       `<tr>${cols.map(c => `<td>${renderCell(rec[c])}</td>`).join('')}</tr>`
     ).join('');
     return `<table class="rec-table">
+      <caption>Groupe : ${esc(groupLabel)}</caption>
       <thead><tr>${thead}</tr></thead>
       <tbody>${tbody}</tbody>
     </table>`;
   }
 
   function renderCell(val) {
-    if (val == null || val === '') return '<span class="cell-null">—</span>';
+    if (val == null || val === '')
+      return '<span class="cell-null" aria-label="valeur vide">—</span>';
     if (val === true)  return '<span class="cell-bool-t">✓ vrai</span>';
     if (val === false) return '<span class="cell-bool-f">✗ faux</span>';
-    if (typeof val === 'number') return `<span class="cell-num">${val.toLocaleString('fr-FR')}</span>`;
+    if (typeof val === 'number')
+      return `<span class="cell-num">${val.toLocaleString('fr-FR')}</span>`;
     if (Array.isArray(val)) return esc(val.join(', '));
     return esc(String(val));
   }
