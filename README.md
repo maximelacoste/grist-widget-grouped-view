@@ -20,7 +20,6 @@ Widget personnalisé pour [Grist](https://www.getgrist.com/) qui affiche les enr
 - **Valeurs nulles** regroupées en *(vide)* et triées en dernier
 - **Formatage des cellules** : booléens ✓/✗, nombres localisés `fr-FR`, listes
 - **Options persistées** via `grist.setOption()` (colonne et tri retenus après rechargement)
-- **Mode démo** intégré : données fictives affichées hors Grist pour tester le widget en standalone
 
 ### Installation
 
@@ -55,7 +54,6 @@ A Grist custom widget that displays table records grouped by any column value, s
 - **Null values** collected in a *(empty)* group, sorted last
 - **Cell formatting** : booleans ✓/✗, localised numbers, arrays
 - **Persisted options** via `grist.setOption()` (column and sort order survive page reload)
-- **Built-in demo mode** : fake records displayed when opened outside Grist
 
 ### Setup
 
