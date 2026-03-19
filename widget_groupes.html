@@ -28,8 +28,10 @@
 
     html, body { margin: 0; padding: 0; background: var(--bg); }
 
-    /* #app reçoit sa hauteur par JS → scrollbar toujours correcte quelle que soit l'iframe */
+    /* #app ancré aux 4 coins de l'iframe */
     #app {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -443,15 +445,11 @@
   const settingsPanel = document.getElementById('settings-panel');
   const btnSettings   = document.getElementById('btn-settings');
 
-  // ── Hauteur par JS — fiable dans toute iframe ──────────
-  function setAppHeight() {
-    app.style.height = window.innerHeight + 'px';
-  }
-  setAppHeight();
-  window.addEventListener('resize', setAppHeight);
-
   // ── Construction du panneau de réglages ────────────────
+  let settingsBuilt = false;
   function buildSettingsPanel() {
+    if (settingsBuilt) return;
+    settingsBuilt = true;
     // Palettes
     const paletteRow = document.getElementById('palette-row');
     Object.entries(PALETTES).forEach(([key, pal]) => {
