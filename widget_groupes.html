@@ -344,7 +344,7 @@
       <div class="color-grid" id="color-grid" aria-labelledby="lbl-colors"></div>
     </div>
 
-    <div>
+    <div id="bool-section" style="display:none">
       <p class="setting-section-title" id="lbl-bool">Affichage vrai / faux</p>
       <div class="bool-row" id="bool-row"
            role="radiogroup" aria-labelledby="lbl-bool"></div>
@@ -422,12 +422,26 @@
   const colorGrid     = document.getElementById('color-grid');
   const boolRow       = document.getElementById('bool-row');
 
+  // ── Détection colonne booléenne visible ───────────────
+  function hasBoolCol() {
+    const displayCols = allColumns.filter(c => c !== groupBy);
+    return displayCols.some(c =>
+      allRecords.some(r => typeof r[c] === 'boolean')
+    );
+  }
+
+  function refreshBoolSection() {
+    const section = document.getElementById('bool-section');
+    if (!section) return;
+    section.style.display = hasBoolCol() ? '' : 'none';
+  }
+
   // ── Bouton réglages ────────────────────────────────────
   btnSettings.addEventListener('click', () => {
     const isOpen = settingsPanel.classList.toggle('open');
     btnSettings.classList.toggle('active', isOpen);
     btnSettings.setAttribute('aria-expanded', String(isOpen));
-    if (isOpen) refreshColorGrid();
+    if (isOpen) { refreshColorGrid(); refreshBoolSection(); }
   });
 
   // ── Construction du panneau — formats booléens ─────────
@@ -720,6 +734,7 @@
       card.appendChild(body);
       content.appendChild(card);
     });
+    refreshBoolSection();
   }
 
   function buildTable(cols, records, groupLabel) {
