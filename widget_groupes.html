@@ -19,19 +19,23 @@
       --accent:       #2563eb;
       --group-stripe: #fafaf9;
       --hover-row:    #f0f6ff;
-      --focus-ring:   0 0 0 2px rgba(37,99,235,0.35);
+      --focus-ring:   0 0 0 2px rgba(37,99,235,.35);
       --radius:       5px;
       --shadow:       0 1px 2px rgba(0,0,0,.06), 0 1px 4px rgba(0,0,0,.04);
       --font:         'IBM Plex Sans', system-ui, sans-serif;
       --mono:         'IBM Plex Mono', monospace;
     }
 
-    html, body { margin: 0; padding: 0; background: var(--bg); }
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+    }
 
-    /* #app ancré aux 4 coins de l'iframe */
     #app {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
+      height: 100%;
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -42,7 +46,7 @@
       background: var(--bg);
     }
 
-    /* ── Toolbar ─────────────────────────────────────── */
+    /* ── Toolbar ── */
     .toolbar {
       display: flex;
       align-items: center;
@@ -55,77 +59,45 @@
       min-height: 36px;
     }
     .toolbar-group { display: flex; align-items: center; gap: 5px; }
-
     .toolbar label {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: .04em;
-      text-transform: uppercase;
-      color: var(--muted);
-      white-space: nowrap;
-      cursor: default;
+      font-size: 11px; font-weight: 600; letter-spacing: .04em;
+      text-transform: uppercase; color: var(--muted); white-space: nowrap; cursor: default;
     }
     .toolbar select {
-      font-family: var(--font);
-      font-size: 12px;
-      padding: 3px 7px;
-      border: 1px solid var(--border-strong);
-      border-radius: var(--radius);
-      background: var(--surface);
-      color: var(--text);
-      cursor: pointer;
-      outline: none;
-      max-width: 180px;
+      font-family: var(--font); font-size: 12px; padding: 3px 7px;
+      border: 1px solid var(--border-strong); border-radius: var(--radius);
+      background: var(--surface); color: var(--text); cursor: pointer; outline: none; max-width: 180px;
     }
     .toolbar select:focus-visible { border-color: var(--accent); box-shadow: var(--focus-ring); }
-
     .toolbar-sep { width: 1px; height: 16px; background: var(--border); flex-shrink: 0; }
     .toolbar-right { margin-left: auto; display: flex; gap: 4px; align-items: center; }
 
     .btn {
-      font-family: var(--font);
-      font-size: 11px;
-      font-weight: 500;
-      padding: 3px 9px;
-      border: 1px solid var(--border-strong);
-      border-radius: var(--radius);
-      background: var(--surface);
-      color: var(--muted);
-      cursor: pointer;
-      white-space: nowrap;
-      transition: background .1s, color .1s, border-color .1s;
-      outline: none;
+      font-family: var(--font); font-size: 11px; font-weight: 500;
+      padding: 3px 9px; border: 1px solid var(--border-strong); border-radius: var(--radius);
+      background: var(--surface); color: var(--muted); cursor: pointer; white-space: nowrap;
+      transition: background .1s, color .1s, border-color .1s; outline: none;
     }
     .btn:hover         { background: var(--bg); color: var(--text); border-color: var(--muted); }
     .btn:active        { background: #e4e4e2; }
     .btn:focus-visible { box-shadow: var(--focus-ring); border-color: var(--accent); }
 
     .btn-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 26px;
-      height: 26px;
-      padding: 0;
-      border: 1px solid var(--border-strong);
-      border-radius: var(--radius);
-      background: var(--surface);
-      cursor: pointer;
-      outline: none;
-      flex-shrink: 0;
-      transition: background .1s, border-color .1s;
-      color: var(--muted);
+      display: flex; align-items: center; justify-content: center;
+      width: 26px; height: 26px; padding: 0;
+      border: 1px solid var(--border-strong); border-radius: var(--radius);
+      background: var(--surface); cursor: pointer; outline: none; flex-shrink: 0;
+      transition: background .1s, border-color .1s; color: var(--muted);
     }
     .btn-icon:hover         { background: var(--bg); border-color: var(--muted); color: var(--text); }
     .btn-icon.active        { background: var(--accent); border-color: var(--accent); color: #fff; }
     .btn-icon:focus-visible { box-shadow: var(--focus-ring); }
 
-    /* ── Panneau de réglages ─────────────────────────── */
+    /* ── Panneau de réglages ── */
     .settings-panel {
       display: none;
-      flex-direction: row;
-      flex-wrap: wrap;
-      gap: 18px;
+      flex-direction: column;
+      gap: 12px;
       padding: 10px 14px;
       background: var(--surface);
       border-bottom: 2px solid var(--accent);
@@ -133,72 +105,95 @@
     }
     .settings-panel.open { display: flex; }
 
-    .setting-group { display: flex; flex-direction: column; gap: 7px; min-width: 140px; }
-    .setting-group-title {
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: .05em;
-      text-transform: uppercase;
-      color: var(--muted);
+    .setting-section-title {
+      font-size: 10px; font-weight: 600; letter-spacing: .05em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 2px;
     }
 
-    /* Palettes */
-    .palette-row { display: flex; gap: 6px; flex-wrap: wrap; }
-    .palette-btn {
+    /* Couleurs par groupe */
+    .color-grid {
       display: flex;
-      gap: 2px;
-      padding: 3px 5px;
-      border: 2px solid var(--border);
-      border-radius: var(--radius);
-      cursor: pointer;
-      background: var(--bg);
-      outline: none;
-      transition: border-color .1s;
+      flex-direction: column;
+      gap: 5px;
     }
-    .palette-btn:hover         { border-color: var(--muted); }
-    .palette-btn.selected      { border-color: var(--accent); }
-    .palette-btn:focus-visible { box-shadow: var(--focus-ring); }
-    .palette-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
+    .color-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .color-row-label {
+      font-size: 12px;
+      font-weight: 500;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: var(--text);
+    }
+    .color-row-label.is-empty { font-style: italic; color: var(--muted); }
+
+    /* input[type=color] stylisé */
+    .color-input-wrap {
+      position: relative;
+      width: 28px;
+      height: 20px;
       flex-shrink: 0;
     }
+    .color-swatch {
+      display: block;
+      width: 28px;
+      height: 20px;
+      border-radius: 4px;
+      border: 2px solid var(--border-strong);
+      cursor: pointer;
+      transition: border-color .1s;
+    }
+    .color-swatch:hover { border-color: var(--muted); }
+    .color-input-wrap input[type="color"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+      padding: 0;
+      border: none;
+    }
+    .color-input-wrap:focus-within .color-swatch { border-color: var(--accent); box-shadow: var(--focus-ring); }
 
-    /* Format booléens */
+    .btn-reset-color {
+      font-size: 10px; padding: 1px 6px;
+      border: 1px solid var(--border-strong); border-radius: var(--radius);
+      background: var(--bg); color: var(--muted); cursor: pointer; outline: none;
+      transition: background .1s, color .1s; white-space: nowrap; flex-shrink: 0;
+      font-family: var(--font);
+    }
+    .btn-reset-color:hover         { color: var(--text); border-color: var(--muted); }
+    .btn-reset-color:focus-visible { box-shadow: var(--focus-ring); }
+
+    /* Formats booléens */
     .bool-row { display: flex; gap: 5px; flex-wrap: wrap; }
     .bool-btn {
-      font-family: var(--font);
-      font-size: 11px;
-      padding: 2px 9px;
-      border: 1px solid var(--border-strong);
-      border-radius: 10px;
-      background: var(--bg);
-      color: var(--muted);
-      cursor: pointer;
-      outline: none;
+      font-family: var(--font); font-size: 11px; padding: 2px 9px;
+      border: 1px solid var(--border-strong); border-radius: 10px;
+      background: var(--bg); color: var(--muted); cursor: pointer; outline: none;
       transition: background .1s, border-color .1s, color .1s;
     }
     .bool-btn:hover         { border-color: var(--muted); color: var(--text); }
     .bool-btn.selected      { background: var(--accent); border-color: var(--accent); color: #fff; }
     .bool-btn:focus-visible { box-shadow: var(--focus-ring); }
 
-    /* ── Stats bar ──────────────────────────────────── */
+    /* ── Stats bar ── */
     .statsbar {
-      display: none;
-      align-items: center;
-      gap: 12px;
-      padding: 4px 10px;
-      background: var(--group-stripe);
-      border-bottom: 1px solid var(--border);
-      flex-shrink: 0;
-      font-size: 11px;
-      color: var(--muted);
+      display: none; align-items: center; gap: 12px; padding: 4px 10px;
+      background: var(--group-stripe); border-bottom: 1px solid var(--border);
+      flex-shrink: 0; font-size: 11px; color: var(--muted);
     }
     .statsbar.visible { display: flex; }
     .stat-val { font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; }
 
-    /* ── Zone de contenu / scroll ───────────────────── */
+    /* ── Zone de contenu / scroll ── */
     .content {
       flex: 1;
       min-height: 0;
@@ -213,52 +208,30 @@
     .content::-webkit-scrollbar       { width: 8px; }
     .content::-webkit-scrollbar-track { background: var(--bg); border-radius: 4px; }
     .content::-webkit-scrollbar-thumb {
-      background: var(--border-strong);
-      border-radius: 4px;
-      border: 2px solid var(--bg);
+      background: var(--border-strong); border-radius: 4px; border: 2px solid var(--bg);
     }
     .content::-webkit-scrollbar-thumb:hover { background: var(--muted); }
 
-    /* ── Empty state ─────────────────────────────────── */
+    /* ── Empty state ── */
     .empty {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      gap: 10px;
-      color: var(--muted);
-      text-align: center;
-      padding: 20px;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; height: 100%; gap: 10px;
+      color: var(--muted); text-align: center; padding: 20px;
     }
     .empty svg   { opacity: .25; }
     .empty-title { font-size: 13px; font-weight: 500; color: var(--text); }
     .empty-sub   { font-size: 12px; }
 
-    /* ── Groupe ──────────────────────────────────────── */
+    /* ── Groupe ── */
     .group {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      box-shadow: var(--shadow);
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow);
     }
     .group-header {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      padding: 6px 10px;
-      width: 100%;
-      text-align: left;
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-family: var(--font);
-      font-size: 13px;
-      color: var(--text);
-      user-select: none;
-      transition: background .1s;
-      outline: none;
+      display: flex; align-items: center; gap: 7px; padding: 6px 10px;
+      width: 100%; text-align: left; background: none; border: none; cursor: pointer;
+      font-family: var(--font); font-size: 13px; color: var(--text);
+      user-select: none; transition: background .1s; outline: none;
     }
     .group-header:hover         { background: var(--bg); }
     .group-header:focus-visible { box-shadow: inset 0 0 0 2px var(--accent); }
@@ -284,15 +257,14 @@
     }
 
     .group-body {
-      display: grid;
-      grid-template-rows: 1fr;
+      display: grid; grid-template-rows: 1fr;
       transition: grid-template-rows .22s cubic-bezier(.4,0,.2,1);
       border-top: 1px solid var(--border);
     }
     .group.collapsed .group-body { grid-template-rows: 0fr; border-top-color: transparent; }
     .group-body-inner { overflow: hidden; }
 
-    /* ── Tableau ─────────────────────────────────────── */
+    /* ── Tableau ── */
     .rec-table { width: 100%; border-collapse: collapse; font-size: 12px; }
     .rec-table caption {
       position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
@@ -304,8 +276,8 @@
       background: var(--group-stripe); border-bottom: 1px solid var(--border);
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px;
     }
-    .rec-table tbody tr          { transition: background .08s; }
-    .rec-table tbody tr:hover td { background: var(--hover-row); }
+    .rec-table tbody tr           { transition: background .08s; }
+    .rec-table tbody tr:hover td  { background: var(--hover-row); }
     .rec-table tbody td {
       padding: 5px 10px; border-bottom: 1px solid var(--border); color: var(--text);
       max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
@@ -314,27 +286,20 @@
 
     .cell-null { color: var(--muted); font-style: italic; font-size: 11px; }
     .cell-num  { font-family: var(--mono); font-size: 11px; }
-    .cell-bool-t { font-weight: 500; }
-
-    .only-group-col {
-      padding: 8px 12px; font-size: 11px; color: var(--muted); font-style: italic;
-    }
+    .only-group-col { padding: 8px 12px; font-size: 11px; color: var(--muted); font-style: italic; }
   </style>
 </head>
 <body>
 <div id="app">
 
   <header class="toolbar" role="toolbar" aria-label="Options de groupement">
-
     <div class="toolbar-group">
       <label for="group-select">Grouper par</label>
       <select id="group-select">
         <option value="">— choisir —</option>
       </select>
     </div>
-
     <div class="toolbar-sep" role="separator" aria-orientation="vertical"></div>
-
     <div class="toolbar-group">
       <label for="sort-select">Tri</label>
       <select id="sort-select">
@@ -344,7 +309,6 @@
         <option value="count-asc">Nb ↑</option>
       </select>
     </div>
-
     <div class="toolbar-right">
       <button class="btn" id="btn-expand"   type="button">Tout déplier</button>
       <button class="btn" id="btn-collapse" type="button">Tout plier</button>
@@ -360,21 +324,18 @@
         </svg>
       </button>
     </div>
-
   </header>
 
-  <!-- Panneau de réglages -->
   <div class="settings-panel" id="settings-panel"
        role="region" aria-label="Réglages d'affichage">
 
-    <div class="setting-group">
-      <p class="setting-group-title" id="lbl-palette">Palette de couleurs</p>
-      <div class="palette-row" id="palette-row"
-           role="radiogroup" aria-labelledby="lbl-palette"></div>
+    <div>
+      <p class="setting-section-title" id="lbl-colors">Couleurs des groupes</p>
+      <div class="color-grid" id="color-grid" aria-labelledby="lbl-colors"></div>
     </div>
 
-    <div class="setting-group">
-      <p class="setting-group-title" id="lbl-bool">Affichage vrai / faux</p>
+    <div>
+      <p class="setting-section-title" id="lbl-bool">Affichage vrai / faux</p>
       <div class="bool-row" id="bool-row"
            role="radiogroup" aria-labelledby="lbl-bool"></div>
     </div>
@@ -388,7 +349,6 @@
   </div>
 
   <main class="content" id="content" aria-label="Groupes d'enregistrements">
-
     <div class="empty" id="empty-state" role="status">
       <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
            stroke="currentColor" stroke-width="1.2"
@@ -399,99 +359,77 @@
       <p class="empty-title">Aucune colonne sélectionnée</p>
       <p class="empty-sub">Choisis une colonne dans la barre ci-dessus<br>pour grouper les enregistrements.</p>
     </div>
-
   </main>
 
-</div><!-- #app -->
+</div>
 
 <script>
   // ── Constantes ─────────────────────────────────────────
-
-  const PALETTES = {
-    vif:     { label: 'Vif',      colors: ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#84cc16','#f97316','#6366f1'] },
-    pastel:  { label: 'Pastel',   colors: ['#93c5fd','#6ee7b7','#fde68a','#fca5a5','#c4b5fd','#f9a8d4','#67e8f9','#d9f99d','#fdba74','#a5b4fc'] },
-    terre:   { label: 'Terre',    colors: ['#92400e','#065f46','#78350f','#7f1d1d','#3b0764','#831843','#164e63','#365314','#7c2d12','#1e1b4b'] },
-    mono:    { label: 'Mono',     colors: ['#18181b','#3f3f46','#71717a','#a1a1aa','#d4d4d8','#e4e4e7','#18181b','#3f3f46','#71717a','#a1a1aa'] },
-  };
+  const DEFAULT_PALETTE = [
+    '#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6',
+    '#ec4899','#06b6d4','#84cc16','#f97316','#6366f1',
+  ];
 
   const BOOL_FORMATS = [
-    { key: 'check',   label: '✓ / ✗',         trueHtml: '<span class="cell-bool-t" style="color:#16a34a">✓ vrai</span>',  falseHtml: '<span style="color:#dc2626">✗ faux</span>' },
-    { key: 'oui',     label: 'Oui / Non',      trueHtml: '<span class="cell-bool-t" style="color:#16a34a">Oui</span>',     falseHtml: '<span style="color:#dc2626">Non</span>' },
-    { key: 'tf',      label: 'True / False',   trueHtml: '<span class="cell-bool-t" style="color:#16a34a">True</span>',    falseHtml: '<span style="color:#dc2626">False</span>' },
-    { key: 'badge',   label: '● badge',        trueHtml: '<span style="display:inline-block;padding:1px 7px;border-radius:9px;background:#dcfce7;color:#166534;font-size:10px;font-weight:600">vrai</span>', falseHtml: '<span style="display:inline-block;padding:1px 7px;border-radius:9px;background:#fee2e2;color:#991b1b;font-size:10px;font-weight:600">faux</span>' },
-    { key: 'plain',   label: '1 / 0',          trueHtml: '<span class="cell-num">1</span>',                                falseHtml: '<span class="cell-num cell-null">0</span>' },
+    { key: 'check', label: '✓ / ✗',
+      t: '<span style="color:#16a34a;font-weight:500">✓ vrai</span>',
+      f: '<span style="color:#dc2626">✗ faux</span>' },
+    { key: 'oui',   label: 'Oui / Non',
+      t: '<span style="color:#16a34a;font-weight:500">Oui</span>',
+      f: '<span style="color:#dc2626">Non</span>' },
+    { key: 'tf',    label: 'True / False',
+      t: '<span style="color:#16a34a;font-weight:500">True</span>',
+      f: '<span style="color:#dc2626">False</span>' },
+    { key: 'badge', label: '● badge',
+      t: '<span style="display:inline-block;padding:1px 7px;border-radius:9px;background:#dcfce7;color:#166534;font-size:10px;font-weight:600">vrai</span>',
+      f: '<span style="display:inline-block;padding:1px 7px;border-radius:9px;background:#fee2e2;color:#991b1b;font-size:10px;font-weight:600">faux</span>' },
+    { key: 'num',   label: '1 / 0',
+      t: '<span class="cell-num">1</span>',
+      f: '<span class="cell-num cell-null">0</span>' },
   ];
 
   // ── État ───────────────────────────────────────────────
-  let allRecords  = [];
-  let allColumns  = [];
-  let groupBy     = '';
-  let sortMode    = 'alpha-asc';
-  let collapsed   = new Set();
-  let colColors   = {};
-  let paletteKey  = 'vif';
-  let boolFmtKey  = 'check';
-  let paletteIdx  = 0;
+  let allRecords = [];
+  let allColumns = [];
+  let groupBy    = '';
+  let sortMode   = 'alpha-asc';
+  let collapsed  = new Set();
+  let colColors  = {};       // key → hex, persisté dans grist options
+  let boolFmtKey = 'check';
+  let paletteIdx = 0;
+  let settingsPanelBuilt = false;
 
   // ── Refs DOM ───────────────────────────────────────────
-  const app         = document.getElementById('app');
-  const groupSelect = document.getElementById('group-select');
-  const sortSelect  = document.getElementById('sort-select');
-  const content     = document.getElementById('content');
-  const statsbar    = document.getElementById('statsbar');
-  const statGroups  = document.getElementById('stat-groups');
-  const statRecords = document.getElementById('stat-records');
-  const emptyState  = document.getElementById('empty-state');
+  const groupSelect   = document.getElementById('group-select');
+  const sortSelect    = document.getElementById('sort-select');
+  const content       = document.getElementById('content');
+  const statsbar      = document.getElementById('statsbar');
+  const statGroups    = document.getElementById('stat-groups');
+  const statRecords   = document.getElementById('stat-records');
+  const emptyState    = document.getElementById('empty-state');
   const settingsPanel = document.getElementById('settings-panel');
   const btnSettings   = document.getElementById('btn-settings');
+  const colorGrid     = document.getElementById('color-grid');
+  const boolRow       = document.getElementById('bool-row');
 
-  // ── Construction du panneau de réglages ────────────────
-  let settingsBuilt = false;
-  function buildSettingsPanel() {
-    if (settingsBuilt) return;
-    settingsBuilt = true;
-    // Palettes
-    const paletteRow = document.getElementById('palette-row');
-    Object.entries(PALETTES).forEach(([key, pal]) => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'palette-btn' + (key === paletteKey ? ' selected' : '');
-      btn.setAttribute('role', 'radio');
-      btn.setAttribute('aria-checked', String(key === paletteKey));
-      btn.setAttribute('aria-label', 'Palette ' + pal.label);
-      btn.title = pal.label;
-      pal.colors.slice(0, 5).forEach(c => {
-        const dot = document.createElement('span');
-        dot.className = 'palette-dot';
-        dot.style.background = c;
-        dot.setAttribute('aria-hidden', 'true');
-        btn.appendChild(dot);
-      });
-      btn.addEventListener('click', () => {
-        paletteKey = key;
-        colColors  = {};
-        paletteIdx = 0;
-        paletteRow.querySelectorAll('.palette-btn').forEach(b => {
-          b.classList.remove('selected');
-          b.setAttribute('aria-checked', 'false');
-        });
-        btn.classList.add('selected');
-        btn.setAttribute('aria-checked', 'true');
-        grist.setOption('paletteKey', paletteKey);
-        render();
-      });
-      paletteRow.appendChild(btn);
-    });
+  // ── Bouton réglages ────────────────────────────────────
+  btnSettings.addEventListener('click', () => {
+    const isOpen = settingsPanel.classList.toggle('open');
+    btnSettings.classList.toggle('active', isOpen);
+    btnSettings.setAttribute('aria-expanded', String(isOpen));
+    if (isOpen) refreshColorGrid();
+  });
 
-    // Formats booléens
-    const boolRow = document.getElementById('bool-row');
+  // ── Construction du panneau — formats booléens ─────────
+  function buildBoolButtons() {
+    boolRow.innerHTML = '';
     BOOL_FORMATS.forEach(fmt => {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'bool-btn' + (fmt.key === boolFmtKey ? ' selected' : '');
       btn.setAttribute('role', 'radio');
       btn.setAttribute('aria-checked', String(fmt.key === boolFmtKey));
-      btn.setAttribute('aria-label', 'Format : ' + fmt.label);
+      btn.setAttribute('aria-label', 'Format booléen : ' + fmt.label);
       btn.textContent = fmt.label;
       btn.addEventListener('click', () => {
         boolFmtKey = fmt.key;
@@ -508,24 +446,97 @@
     });
   }
 
-  // ── Bouton réglages ────────────────────────────────────
-  btnSettings.addEventListener('click', () => {
-    const isOpen = settingsPanel.classList.toggle('open');
-    btnSettings.classList.toggle('active', isOpen);
-    btnSettings.setAttribute('aria-expanded', String(isOpen));
-  });
+  // ── Grille de couleurs — une ligne par groupe connu ────
+  function refreshColorGrid() {
+    colorGrid.innerHTML = '';
+    const groups = getGroups();
+    if (groups.length === 0) {
+      const msg = document.createElement('p');
+      msg.style.cssText = 'font-size:11px;color:var(--muted);font-style:italic';
+      msg.textContent = 'Aucun groupe — choisis une colonne de groupement.';
+      colorGrid.appendChild(msg);
+      return;
+    }
+    groups.forEach(group => {
+      const isEmpty = group.key === '\x00__empty__';
+      const label   = isEmpty ? '(vide)' : String(group.label);
+      const color   = colColors[group.key] || DEFAULT_PALETTE[0];
+
+      const row = document.createElement('div');
+      row.className = 'color-row';
+
+      // Pastille + input color
+      const wrap = document.createElement('div');
+      wrap.className = 'color-input-wrap';
+
+      const swatch = document.createElement('span');
+      swatch.className = 'color-swatch';
+      swatch.style.background = color;
+      swatch.setAttribute('aria-hidden', 'true');
+
+      const input = document.createElement('input');
+      input.type = 'color';
+      input.value = color;
+      input.setAttribute('aria-label', 'Couleur du groupe ' + label);
+
+      input.addEventListener('input', () => {
+        swatch.style.background = input.value;
+      });
+      input.addEventListener('change', () => {
+        colColors[group.key] = input.value;
+        swatch.style.background = input.value;
+        saveColors();
+        render();
+      });
+
+      wrap.appendChild(swatch);
+      wrap.appendChild(input);
+
+      // Libellé
+      const lbl = document.createElement('span');
+      lbl.className = 'color-row-label' + (isEmpty ? ' is-empty' : '');
+      lbl.textContent = label;
+
+      // Bouton reset
+      const resetBtn = document.createElement('button');
+      resetBtn.type = 'button';
+      resetBtn.className = 'btn-reset-color';
+      resetBtn.textContent = 'Réinitialiser';
+      resetBtn.setAttribute('aria-label', 'Réinitialiser la couleur du groupe ' + label);
+      resetBtn.addEventListener('click', () => {
+        const idx = groups.indexOf(group);
+        const def = DEFAULT_PALETTE[idx % DEFAULT_PALETTE.length];
+        colColors[group.key] = def;
+        input.value = def;
+        swatch.style.background = def;
+        saveColors();
+        render();
+      });
+
+      row.appendChild(wrap);
+      row.appendChild(lbl);
+      row.appendChild(resetBtn);
+      colorGrid.appendChild(row);
+    });
+  }
+
+  function saveColors() {
+    grist.setOption('colColors', JSON.stringify(colColors));
+  }
 
   // ── Grist ──────────────────────────────────────────────
   grist.ready({ requiredAccess: 'read table' });
 
   grist.onOptions((opts) => {
-    if (!opts) return;
-    if (opts.groupBy)    { groupBy   = opts.groupBy;   groupSelect.value = groupBy;  }
-    if (opts.sortMode)   { sortMode  = opts.sortMode;  sortSelect.value  = sortMode; }
-    if (opts.paletteKey && PALETTES[opts.paletteKey])  paletteKey = opts.paletteKey;
+    if (!opts) { buildBoolButtons(); return; }
+    if (opts.groupBy)    { groupBy = opts.groupBy; groupSelect.value = groupBy; }
+    if (opts.sortMode)   { sortMode = opts.sortMode; sortSelect.value = sortMode; }
     if (opts.boolFmtKey && BOOL_FORMATS.find(f => f.key === opts.boolFmtKey))
       boolFmtKey = opts.boolFmtKey;
-    buildSettingsPanel();
+    if (opts.colColors) {
+      try { colColors = JSON.parse(opts.colColors); } catch(e) { colColors = {}; }
+    }
+    buildBoolButtons();
     render();
   });
 
@@ -539,8 +550,7 @@
     render();
   });
 
-  // Premier appel si onOptions n'est pas déclenché
-  buildSettingsPanel();
+  buildBoolButtons();
 
   // ── Sélecteur de colonne ───────────────────────────────
   function rebuildColumnSelect() {
@@ -548,8 +558,7 @@
     groupSelect.innerHTML = '<option value="">— choisir —</option>';
     allColumns.forEach(col => {
       const opt = document.createElement('option');
-      opt.value = col;
-      opt.textContent = col;
+      opt.value = col; opt.textContent = col;
       groupSelect.appendChild(opt);
     });
     const target = groupBy || prev;
@@ -557,9 +566,8 @@
   }
 
   groupSelect.addEventListener('change', () => {
-    groupBy    = groupSelect.value;
+    groupBy = groupSelect.value;
     collapsed.clear();
-    colColors  = {};
     paletteIdx = 0;
     grist.setOption('groupBy', groupBy);
     render();
@@ -599,9 +607,10 @@
     });
     const groups = Array.from(map.values());
 
-    const palette = PALETTES[paletteKey].colors;
-    groups.forEach(g => {
-      if (!colColors[g.key]) colColors[g.key] = palette[paletteIdx++ % palette.length];
+    // Couleur par défaut si pas encore définie
+    groups.forEach((g, i) => {
+      if (!colColors[g.key])
+        colColors[g.key] = DEFAULT_PALETTE[i % DEFAULT_PALETTE.length];
     });
 
     groups.sort((a, b) => {
@@ -721,7 +730,7 @@
       return '<span class="cell-null" aria-label="valeur vide">—</span>';
     if (val === true || val === false) {
       const fmt = BOOL_FORMATS.find(f => f.key === boolFmtKey) || BOOL_FORMATS[0];
-      return val ? fmt.trueHtml : fmt.falseHtml;
+      return val ? fmt.t : fmt.f;
     }
     if (typeof val === 'number') {
       const isYearLike = Number.isInteger(val) && val >= 1000 && val <= 9999;
@@ -733,10 +742,8 @@
 
   function esc(s) {
     return String(s)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 </script>
 </body>
