@@ -26,7 +26,8 @@
       --mono:         'IBM Plex Mono', monospace;
     }
 
-    html, body { height: 100vh; }
+    html { height: 100%; }
+    body { height: 100vh; }
 
     body {
       font-family: var(--font);
@@ -129,8 +130,8 @@
 
     /* ── Zone de contenu avec ascenseur permanent ── */
     .content {
-      min-height: 0;
       flex: 1;
+      min-height: 0;               /* permet au flex child de se contraindre */
       overflow-y: scroll;          /* ascenseur toujours visible */
       scrollbar-gutter: stable;    /* réserve l'espace même vide */
       padding: 8px 10px;
@@ -583,8 +584,12 @@
       return '<span class="cell-null" aria-label="valeur vide">—</span>';
     if (val === true)  return '<span class="cell-bool-t">✓ vrai</span>';
     if (val === false) return '<span class="cell-bool-f">✗ faux</span>';
-    if (typeof val === 'number')
-      return `<span class="cell-num">${val.toLocaleString('fr-FR')}</span>`;
+    if (typeof val === 'number') {
+      // Pas de séparateur de milliers pour les entiers à 4 chiffres (années, codes…)
+      const isYear = Number.isInteger(val) && val >= 1000 && val <= 9999;
+      const fmt = isYear ? String(val) : val.toLocaleString('fr-FR');
+      return `<span class="cell-num">${fmt}</span>`;
+    }
     if (Array.isArray(val)) return esc(val.join(', '));
     return esc(String(val));
   }
