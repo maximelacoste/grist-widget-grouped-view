@@ -26,8 +26,7 @@
       --mono:         'IBM Plex Mono', monospace;
     }
 
-    html { height: 100%; }
-    body { height: 100vh; }
+    html, body { margin: 0; padding: 0; height: 100%; }
 
     body {
       font-family: var(--font);
@@ -35,6 +34,12 @@
       color: var(--text);
       font-size: 13px;
       line-height: 1.5;
+    }
+
+    /* Conteneur ancré aux 4 coins — ascenseur fiable dans toute iframe */
+    #app {
+      position: fixed;
+      inset: 0;
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -310,6 +315,7 @@
   </style>
 </head>
 <body>
+<div id="app">
 
 <header class="toolbar" role="toolbar" aria-label="Options de groupement">
 
@@ -359,6 +365,8 @@
   </div>
 
 </main>
+
+</div><!-- #app -->
 
 <script>
   // ── État ───────────────────────────────────────────────
