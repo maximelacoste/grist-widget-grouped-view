@@ -1,0 +1,22 @@
+Élève,Secteur,Statut,Orientation,Établissement,Année,Prioritaire
+Amara Diallo,Nord,En attente,SEGPA,CLG Victor Hugo,2025,true
+Lucas Martin,Sud,Validé,ULIS,CLG Clémence Isaure,2025,false
+Inès Bensalah,Nord,Validé,SEGPA,CLG Victor Hugo,2025,true
+Tom Chevalier,Est,En attente,ULIS,CLG Jean Jaurès,2025,false
+Fatou Traoré,Ouest,Refusé,SEGPA,CLG des Minimes,2025,true
+Mathieu Perez,Sud,Validé,SEGPA,CLG Clémence Isaure,2025,false
+Camille Roy,Nord,En attente,IME,CLG Victor Hugo,2024,false
+Nour El Amine,Est,Validé,SEGPA,CLG Jean Jaurès,2025,true
+Zoé Fontaine,Ouest,Validé,ULIS,CLG des Minimes,2024,false
+Raphaël Bouvet,Centre,En attente,SEGPA,CLG Fermat,2025,false
+Salma Ounis,Centre,Validé,IME,CLG Fermat,2025,true
+Hugo Lefebvre,Sud,Refusé,ULIS,CLG Clémence Isaure,2024,false
+Maëva Garnier,Nord,Validé,SEGPA,CLG Victor Hugo,2025,false
+Yanis Hamidi,Est,En attente,IME,CLG Jean Jaurès,2025,true
+Chloé Bernard,Centre,Validé,SEGPA,CLG Fermat,2024,false
+Adam Sow,Ouest,En attente,SEGPA,CLG des Minimes,2025,true
+Léa Moreau,Sud,Validé,ULIS,CLG Clémence Isaure,2025,false
+Bilal Essid,Centre,Refusé,SEGPA,CLG Fermat,2025,false
+Emma Vasseur,Nord,Validé,ULIS,CLG Victor Hugo,2024,true
+Maxence Dupuy,Est,Validé,SEGPA,CLG Jean Jaurès,2025,false
+Sirine Belhadj,,En attente,SEGPA,CLG Victor Hugo,2025,false
