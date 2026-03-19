@@ -21,31 +21,26 @@
       --hover-row:    #f0f6ff;
       --focus-ring:   0 0 0 2px rgba(37,99,235,0.35);
       --radius:       5px;
-      --shadow:       0 1px 2px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04);
+      --shadow:       0 1px 2px rgba(0,0,0,.06), 0 1px 4px rgba(0,0,0,.04);
       --font:         'IBM Plex Sans', system-ui, sans-serif;
       --mono:         'IBM Plex Mono', monospace;
     }
 
-    html, body { margin: 0; padding: 0; height: 100%; }
+    html, body { margin: 0; padding: 0; background: var(--bg); }
 
-    body {
-      font-family: var(--font);
-      background: var(--bg);
-      color: var(--text);
-      font-size: 13px;
-      line-height: 1.5;
-    }
-
-    /* Conteneur ancré aux 4 coins — ascenseur fiable dans toute iframe */
+    /* #app reçoit sa hauteur par JS → scrollbar toujours correcte quelle que soit l'iframe */
     #app {
-      position: fixed;
-      inset: 0;
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      font-family: var(--font);
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.5;
+      background: var(--bg);
     }
 
-    /* ── Toolbar ── */
+    /* ── Toolbar ─────────────────────────────────────── */
     .toolbar {
       display: flex;
       align-items: center;
@@ -57,19 +52,17 @@
       flex-wrap: wrap;
       min-height: 36px;
     }
-
     .toolbar-group { display: flex; align-items: center; gap: 5px; }
 
     .toolbar label {
       font-size: 11px;
       font-weight: 600;
-      letter-spacing: 0.04em;
+      letter-spacing: .04em;
       text-transform: uppercase;
       color: var(--muted);
       white-space: nowrap;
       cursor: default;
     }
-
     .toolbar select {
       font-family: var(--font);
       font-size: 12px;
@@ -82,19 +75,10 @@
       outline: none;
       max-width: 180px;
     }
-    .toolbar select:focus-visible {
-      border-color: var(--accent);
-      box-shadow: var(--focus-ring);
-    }
+    .toolbar select:focus-visible { border-color: var(--accent); box-shadow: var(--focus-ring); }
 
-    .toolbar-sep {
-      width: 1px;
-      height: 16px;
-      background: var(--border);
-      flex-shrink: 0;
-    }
-
-    .toolbar-right { margin-left: auto; display: flex; gap: 4px; }
+    .toolbar-sep { width: 1px; height: 16px; background: var(--border); flex-shrink: 0; }
+    .toolbar-right { margin-left: auto; display: flex; gap: 4px; align-items: center; }
 
     .btn {
       font-family: var(--font);
@@ -107,14 +91,97 @@
       color: var(--muted);
       cursor: pointer;
       white-space: nowrap;
-      transition: background 0.1s, color 0.1s, border-color 0.1s;
+      transition: background .1s, color .1s, border-color .1s;
       outline: none;
     }
-    .btn:hover { background: var(--bg); color: var(--text); border-color: var(--muted); }
-    .btn:active { background: #e4e4e2; }
+    .btn:hover         { background: var(--bg); color: var(--text); border-color: var(--muted); }
+    .btn:active        { background: #e4e4e2; }
     .btn:focus-visible { box-shadow: var(--focus-ring); border-color: var(--accent); }
 
-    /* ── Stats bar ── */
+    .btn-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      padding: 0;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      outline: none;
+      flex-shrink: 0;
+      transition: background .1s, border-color .1s;
+      color: var(--muted);
+    }
+    .btn-icon:hover         { background: var(--bg); border-color: var(--muted); color: var(--text); }
+    .btn-icon.active        { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .btn-icon:focus-visible { box-shadow: var(--focus-ring); }
+
+    /* ── Panneau de réglages ─────────────────────────── */
+    .settings-panel {
+      display: none;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 18px;
+      padding: 10px 14px;
+      background: var(--surface);
+      border-bottom: 2px solid var(--accent);
+      flex-shrink: 0;
+    }
+    .settings-panel.open { display: flex; }
+
+    .setting-group { display: flex; flex-direction: column; gap: 7px; min-width: 140px; }
+    .setting-group-title {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* Palettes */
+    .palette-row { display: flex; gap: 6px; flex-wrap: wrap; }
+    .palette-btn {
+      display: flex;
+      gap: 2px;
+      padding: 3px 5px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      background: var(--bg);
+      outline: none;
+      transition: border-color .1s;
+    }
+    .palette-btn:hover         { border-color: var(--muted); }
+    .palette-btn.selected      { border-color: var(--accent); }
+    .palette-btn:focus-visible { box-shadow: var(--focus-ring); }
+    .palette-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* Format booléens */
+    .bool-row { display: flex; gap: 5px; flex-wrap: wrap; }
+    .bool-btn {
+      font-family: var(--font);
+      font-size: 11px;
+      padding: 2px 9px;
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      background: var(--bg);
+      color: var(--muted);
+      cursor: pointer;
+      outline: none;
+      transition: background .1s, border-color .1s, color .1s;
+    }
+    .bool-btn:hover         { border-color: var(--muted); color: var(--text); }
+    .bool-btn.selected      { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .bool-btn:focus-visible { box-shadow: var(--focus-ring); }
+
+    /* ── Stats bar ──────────────────────────────────── */
     .statsbar {
       display: none;
       align-items: center;
@@ -127,37 +194,30 @@
       color: var(--muted);
     }
     .statsbar.visible { display: flex; }
-    .stat-val {
-      font-weight: 600;
-      color: var(--text);
-      font-variant-numeric: tabular-nums;
-    }
+    .stat-val { font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; }
 
-    /* ── Zone de contenu avec ascenseur permanent ── */
+    /* ── Zone de contenu / scroll ───────────────────── */
     .content {
       flex: 1;
-      min-height: 0;               /* permet au flex child de se contraindre */
-      overflow-y: scroll;          /* ascenseur toujours visible */
-      scrollbar-gutter: stable;    /* réserve l'espace même vide */
+      min-height: 0;
+      overflow-y: auto;
       padding: 8px 10px;
       display: flex;
       flex-direction: column;
       gap: 5px;
-      /* Firefox */
       scrollbar-width: thin;
       scrollbar-color: var(--border-strong) var(--bg);
     }
-    /* Chromium / Safari */
-    .content::-webkit-scrollbar        { width: 8px; }
-    .content::-webkit-scrollbar-track  { background: var(--bg); border-radius: 4px; }
-    .content::-webkit-scrollbar-thumb  {
+    .content::-webkit-scrollbar       { width: 8px; }
+    .content::-webkit-scrollbar-track { background: var(--bg); border-radius: 4px; }
+    .content::-webkit-scrollbar-thumb {
       background: var(--border-strong);
       border-radius: 4px;
       border: 2px solid var(--bg);
     }
     .content::-webkit-scrollbar-thumb:hover { background: var(--muted); }
 
-    /* ── Empty state ── */
+    /* ── Empty state ─────────────────────────────────── */
     .empty {
       display: flex;
       flex-direction: column;
@@ -169,11 +229,11 @@
       text-align: center;
       padding: 20px;
     }
-    .empty svg      { opacity: 0.25; }
-    .empty-title    { font-size: 13px; font-weight: 500; color: var(--text); }
-    .empty-sub      { font-size: 12px; }
+    .empty svg   { opacity: .25; }
+    .empty-title { font-size: 13px; font-weight: 500; color: var(--text); }
+    .empty-sub   { font-size: 12px; }
 
-    /* ── Groupe ── */
+    /* ── Groupe ──────────────────────────────────────── */
     .group {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -181,8 +241,6 @@
       overflow: hidden;
       box-shadow: var(--shadow);
     }
-
-    /* En-tête : <button> natif = clavier + lecteur d'écran OK */
     .group-header {
       display: flex;
       align-items: center;
@@ -197,193 +255,184 @@
       font-size: 13px;
       color: var(--text);
       user-select: none;
-      transition: background 0.1s;
+      transition: background .1s;
       outline: none;
     }
-    .group-header:hover        { background: var(--bg); }
+    .group-header:hover         { background: var(--bg); }
     .group-header:focus-visible { box-shadow: inset 0 0 0 2px var(--accent); }
 
     .chevron {
-      width: 14px; height: 14px;
-      flex-shrink: 0;
-      color: var(--muted);
-      transition: transform 0.2s cubic-bezier(0.4,0,0.2,1);
+      width: 14px; height: 14px; flex-shrink: 0; color: var(--muted);
+      transition: transform .2s cubic-bezier(.4,0,.2,1);
     }
     .group.collapsed .chevron { transform: rotate(-90deg); }
 
-    .group-dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
+    .group-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 
     .group-label {
-      font-size: 13px;
-      font-weight: 600;
-      flex: 1;
-      min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      font-size: 13px; font-weight: 600; flex: 1; min-width: 0;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
-    .group-label.is-empty {
-      font-weight: 400;
-      font-style: italic;
-      color: var(--muted);
-    }
+    .group-label.is-empty { font-weight: 400; font-style: italic; color: var(--muted); }
 
     .group-badge {
-      font-family: var(--mono);
-      font-size: 10px;
-      font-weight: 500;
-      padding: 1px 7px;
-      border-radius: 10px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      color: var(--muted);
-      flex-shrink: 0;
+      font-family: var(--mono); font-size: 10px; font-weight: 500;
+      padding: 1px 7px; border-radius: 10px;
+      background: var(--bg); border: 1px solid var(--border); color: var(--muted); flex-shrink: 0;
     }
 
-    /* Corps accordéon */
     .group-body {
       display: grid;
       grid-template-rows: 1fr;
-      transition: grid-template-rows 0.22s cubic-bezier(0.4,0,0.2,1);
+      transition: grid-template-rows .22s cubic-bezier(.4,0,.2,1);
       border-top: 1px solid var(--border);
     }
-    .group.collapsed .group-body {
-      grid-template-rows: 0fr;
-      border-top-color: transparent;
-    }
+    .group.collapsed .group-body { grid-template-rows: 0fr; border-top-color: transparent; }
     .group-body-inner { overflow: hidden; }
 
-    /* ── Tableau ── */
-    .rec-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 12px;
-    }
-    /* Caption masquée visuellement, lisible par les lecteurs d'écran */
+    /* ── Tableau ─────────────────────────────────────── */
+    .rec-table { width: 100%; border-collapse: collapse; font-size: 12px; }
     .rec-table caption {
-      position: absolute;
-      width: 1px; height: 1px;
-      padding: 0; margin: -1px;
-      overflow: hidden;
-      clip: rect(0,0,0,0);
-      white-space: nowrap;
-      border: 0;
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
     }
     .rec-table thead th {
-      font-family: var(--mono);
-      font-size: 10px;
-      font-weight: 500;
-      color: var(--muted);
-      letter-spacing: 0.03em;
-      padding: 4px 10px;
-      text-align: left;
-      background: var(--group-stripe);
-      border-bottom: 1px solid var(--border);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 160px;
+      font-family: var(--mono); font-size: 10px; font-weight: 500; color: var(--muted);
+      letter-spacing: .03em; padding: 4px 10px; text-align: left;
+      background: var(--group-stripe); border-bottom: 1px solid var(--border);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px;
     }
-    .rec-table tbody tr           { transition: background 0.08s; }
-    .rec-table tbody tr:hover td  { background: var(--hover-row); }
+    .rec-table tbody tr          { transition: background .08s; }
+    .rec-table tbody tr:hover td { background: var(--hover-row); }
     .rec-table tbody td {
-      padding: 5px 10px;
-      border-bottom: 1px solid var(--border);
-      color: var(--text);
-      max-width: 220px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      padding: 5px 10px; border-bottom: 1px solid var(--border); color: var(--text);
+      max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
     .rec-table tbody tr:last-child td { border-bottom: none; }
 
-    .cell-null   { color: var(--muted); font-style: italic; font-size: 11px; }
-    .cell-bool-t { color: #16a34a; font-weight: 500; }
-    .cell-bool-f { color: #dc2626; }
-    .cell-num    { font-family: var(--mono); font-size: 11px; }
+    .cell-null { color: var(--muted); font-style: italic; font-size: 11px; }
+    .cell-num  { font-family: var(--mono); font-size: 11px; }
+    .cell-bool-t { font-weight: 500; }
 
     .only-group-col {
-      padding: 8px 12px;
-      font-size: 11px;
-      color: var(--muted);
-      font-style: italic;
+      padding: 8px 12px; font-size: 11px; color: var(--muted); font-style: italic;
     }
   </style>
 </head>
 <body>
 <div id="app">
 
-<header class="toolbar" role="toolbar" aria-label="Options de groupement">
+  <header class="toolbar" role="toolbar" aria-label="Options de groupement">
 
-  <div class="toolbar-group">
-    <label for="group-select">Grouper par</label>
-    <select id="group-select">
-      <option value="">— choisir —</option>
-    </select>
+    <div class="toolbar-group">
+      <label for="group-select">Grouper par</label>
+      <select id="group-select">
+        <option value="">— choisir —</option>
+      </select>
+    </div>
+
+    <div class="toolbar-sep" role="separator" aria-orientation="vertical"></div>
+
+    <div class="toolbar-group">
+      <label for="sort-select">Tri</label>
+      <select id="sort-select">
+        <option value="alpha-asc">A → Z</option>
+        <option value="alpha-desc">Z → A</option>
+        <option value="count-desc">Nb ↓</option>
+        <option value="count-asc">Nb ↑</option>
+      </select>
+    </div>
+
+    <div class="toolbar-right">
+      <button class="btn" id="btn-expand"   type="button">Tout déplier</button>
+      <button class="btn" id="btn-collapse" type="button">Tout plier</button>
+      <div class="toolbar-sep" role="separator" aria-orientation="vertical"></div>
+      <button class="btn-icon" id="btn-settings" type="button"
+              aria-label="Réglages d'affichage" aria-expanded="false" aria-controls="settings-panel">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true" focusable="false">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
+    </div>
+
+  </header>
+
+  <!-- Panneau de réglages -->
+  <div class="settings-panel" id="settings-panel"
+       role="region" aria-label="Réglages d'affichage">
+
+    <div class="setting-group">
+      <p class="setting-group-title" id="lbl-palette">Palette de couleurs</p>
+      <div class="palette-row" id="palette-row"
+           role="radiogroup" aria-labelledby="lbl-palette"></div>
+    </div>
+
+    <div class="setting-group">
+      <p class="setting-group-title" id="lbl-bool">Affichage vrai / faux</p>
+      <div class="bool-row" id="bool-row"
+           role="radiogroup" aria-labelledby="lbl-bool"></div>
+    </div>
+
   </div>
 
-  <div class="toolbar-sep" role="separator" aria-orientation="vertical"></div>
-
-  <div class="toolbar-group">
-    <label for="sort-select">Tri</label>
-    <select id="sort-select">
-      <option value="alpha-asc">A → Z</option>
-      <option value="alpha-desc">Z → A</option>
-      <option value="count-desc">Nb ↓</option>
-      <option value="count-asc">Nb ↑</option>
-    </select>
+  <div class="statsbar" id="statsbar" role="status" aria-live="polite" aria-atomic="true">
+    <span><span class="stat-val" id="stat-groups">0</span> groupes</span>
+    <span aria-hidden="true">·</span>
+    <span><span class="stat-val" id="stat-records">0</span> enregistrements</span>
   </div>
 
-  <div class="toolbar-right">
-    <button class="btn" id="btn-expand"   type="button">Tout déplier</button>
-    <button class="btn" id="btn-collapse" type="button">Tout plier</button>
-  </div>
+  <main class="content" id="content" aria-label="Groupes d'enregistrements">
 
-</header>
+    <div class="empty" id="empty-state" role="status">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="1.2"
+           aria-hidden="true" focusable="false">
+        <rect x="3" y="3" width="18" height="18" rx="2.5"/>
+        <path d="M3 9h18M9 21V9"/>
+      </svg>
+      <p class="empty-title">Aucune colonne sélectionnée</p>
+      <p class="empty-sub">Choisis une colonne dans la barre ci-dessus<br>pour grouper les enregistrements.</p>
+    </div>
 
-<div class="statsbar" id="statsbar" role="status" aria-live="polite" aria-atomic="true">
-  <span><span class="stat-val" id="stat-groups">0</span> groupes</span>
-  <span aria-hidden="true">·</span>
-  <span><span class="stat-val" id="stat-records">0</span> enregistrements</span>
-</div>
-
-<main class="content" id="content" aria-label="Groupes d'enregistrements">
-
-  <div class="empty" id="empty-state" role="status">
-    <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
-         stroke="currentColor" stroke-width="1.2"
-         aria-hidden="true" focusable="false">
-      <rect x="3" y="3" width="18" height="18" rx="2.5"/>
-      <path d="M3 9h18M9 21V9"/>
-    </svg>
-    <p class="empty-title">Aucune colonne sélectionnée</p>
-    <p class="empty-sub">Choisis une colonne dans la barre ci-dessus<br>pour grouper les enregistrements.</p>
-  </div>
-
-</main>
+  </main>
 
 </div><!-- #app -->
 
 <script>
-  // ── État ───────────────────────────────────────────────
-  let allRecords = [];
-  let allColumns = [];
-  let groupBy    = '';
-  let sortMode   = 'alpha-asc';
-  let collapsed  = new Set();
-  let colColors  = {};
+  // ── Constantes ─────────────────────────────────────────
 
-  const PALETTE = [
-    '#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6',
-    '#ec4899','#06b6d4','#84cc16','#f97316','#6366f1',
+  const PALETTES = {
+    vif:     { label: 'Vif',      colors: ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#84cc16','#f97316','#6366f1'] },
+    pastel:  { label: 'Pastel',   colors: ['#93c5fd','#6ee7b7','#fde68a','#fca5a5','#c4b5fd','#f9a8d4','#67e8f9','#d9f99d','#fdba74','#a5b4fc'] },
+    terre:   { label: 'Terre',    colors: ['#92400e','#065f46','#78350f','#7f1d1d','#3b0764','#831843','#164e63','#365314','#7c2d12','#1e1b4b'] },
+    mono:    { label: 'Mono',     colors: ['#18181b','#3f3f46','#71717a','#a1a1aa','#d4d4d8','#e4e4e7','#18181b','#3f3f46','#71717a','#a1a1aa'] },
+  };
+
+  const BOOL_FORMATS = [
+    { key: 'check',   label: '✓ / ✗',         trueHtml: '<span class="cell-bool-t" style="color:#16a34a">✓ vrai</span>',  falseHtml: '<span style="color:#dc2626">✗ faux</span>' },
+    { key: 'oui',     label: 'Oui / Non',      trueHtml: '<span class="cell-bool-t" style="color:#16a34a">Oui</span>',     falseHtml: '<span style="color:#dc2626">Non</span>' },
+    { key: 'tf',      label: 'True / False',   trueHtml: '<span class="cell-bool-t" style="color:#16a34a">True</span>',    falseHtml: '<span style="color:#dc2626">False</span>' },
+    { key: 'badge',   label: '● badge',        trueHtml: '<span style="display:inline-block;padding:1px 7px;border-radius:9px;background:#dcfce7;color:#166534;font-size:10px;font-weight:600">vrai</span>', falseHtml: '<span style="display:inline-block;padding:1px 7px;border-radius:9px;background:#fee2e2;color:#991b1b;font-size:10px;font-weight:600">faux</span>' },
+    { key: 'plain',   label: '1 / 0',          trueHtml: '<span class="cell-num">1</span>',                                falseHtml: '<span class="cell-num cell-null">0</span>' },
   ];
-  let paletteIdx = 0;
+
+  // ── État ───────────────────────────────────────────────
+  let allRecords  = [];
+  let allColumns  = [];
+  let groupBy     = '';
+  let sortMode    = 'alpha-asc';
+  let collapsed   = new Set();
+  let colColors   = {};
+  let paletteKey  = 'vif';
+  let boolFmtKey  = 'check';
+  let paletteIdx  = 0;
 
   // ── Refs DOM ───────────────────────────────────────────
+  const app         = document.getElementById('app');
   const groupSelect = document.getElementById('group-select');
   const sortSelect  = document.getElementById('sort-select');
   const content     = document.getElementById('content');
@@ -391,14 +440,94 @@
   const statGroups  = document.getElementById('stat-groups');
   const statRecords = document.getElementById('stat-records');
   const emptyState  = document.getElementById('empty-state');
+  const settingsPanel = document.getElementById('settings-panel');
+  const btnSettings   = document.getElementById('btn-settings');
+
+  // ── Hauteur par JS — fiable dans toute iframe ──────────
+  function setAppHeight() {
+    app.style.height = window.innerHeight + 'px';
+  }
+  setAppHeight();
+  window.addEventListener('resize', setAppHeight);
+
+  // ── Construction du panneau de réglages ────────────────
+  function buildSettingsPanel() {
+    // Palettes
+    const paletteRow = document.getElementById('palette-row');
+    Object.entries(PALETTES).forEach(([key, pal]) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'palette-btn' + (key === paletteKey ? ' selected' : '');
+      btn.setAttribute('role', 'radio');
+      btn.setAttribute('aria-checked', String(key === paletteKey));
+      btn.setAttribute('aria-label', 'Palette ' + pal.label);
+      btn.title = pal.label;
+      pal.colors.slice(0, 5).forEach(c => {
+        const dot = document.createElement('span');
+        dot.className = 'palette-dot';
+        dot.style.background = c;
+        dot.setAttribute('aria-hidden', 'true');
+        btn.appendChild(dot);
+      });
+      btn.addEventListener('click', () => {
+        paletteKey = key;
+        colColors  = {};
+        paletteIdx = 0;
+        paletteRow.querySelectorAll('.palette-btn').forEach(b => {
+          b.classList.remove('selected');
+          b.setAttribute('aria-checked', 'false');
+        });
+        btn.classList.add('selected');
+        btn.setAttribute('aria-checked', 'true');
+        grist.setOption('paletteKey', paletteKey);
+        render();
+      });
+      paletteRow.appendChild(btn);
+    });
+
+    // Formats booléens
+    const boolRow = document.getElementById('bool-row');
+    BOOL_FORMATS.forEach(fmt => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'bool-btn' + (fmt.key === boolFmtKey ? ' selected' : '');
+      btn.setAttribute('role', 'radio');
+      btn.setAttribute('aria-checked', String(fmt.key === boolFmtKey));
+      btn.setAttribute('aria-label', 'Format : ' + fmt.label);
+      btn.textContent = fmt.label;
+      btn.addEventListener('click', () => {
+        boolFmtKey = fmt.key;
+        boolRow.querySelectorAll('.bool-btn').forEach(b => {
+          b.classList.remove('selected');
+          b.setAttribute('aria-checked', 'false');
+        });
+        btn.classList.add('selected');
+        btn.setAttribute('aria-checked', 'true');
+        grist.setOption('boolFmtKey', boolFmtKey);
+        render();
+      });
+      boolRow.appendChild(btn);
+    });
+  }
+
+  // ── Bouton réglages ────────────────────────────────────
+  btnSettings.addEventListener('click', () => {
+    const isOpen = settingsPanel.classList.toggle('open');
+    btnSettings.classList.toggle('active', isOpen);
+    btnSettings.setAttribute('aria-expanded', String(isOpen));
+  });
 
   // ── Grist ──────────────────────────────────────────────
   grist.ready({ requiredAccess: 'read table' });
 
   grist.onOptions((opts) => {
     if (!opts) return;
-    if (opts.groupBy)  { groupBy  = opts.groupBy;  groupSelect.value = groupBy;  }
-    if (opts.sortMode) { sortMode = opts.sortMode; sortSelect.value  = sortMode; }
+    if (opts.groupBy)    { groupBy   = opts.groupBy;   groupSelect.value = groupBy;  }
+    if (opts.sortMode)   { sortMode  = opts.sortMode;  sortSelect.value  = sortMode; }
+    if (opts.paletteKey && PALETTES[opts.paletteKey])  paletteKey = opts.paletteKey;
+    if (opts.boolFmtKey && BOOL_FORMATS.find(f => f.key === opts.boolFmtKey))
+      boolFmtKey = opts.boolFmtKey;
+    buildSettingsPanel();
     render();
   });
 
@@ -411,6 +540,9 @@
     }
     render();
   });
+
+  // Premier appel si onOptions n'est pas déclenché
+  buildSettingsPanel();
 
   // ── Sélecteur de colonne ───────────────────────────────
   function rebuildColumnSelect() {
@@ -467,14 +599,15 @@
       if (!map.has(key)) map.set(key, { key, label: raw, records: [] });
       map.get(key).records.push(rec);
     });
-    let groups = Array.from(map.values());
+    const groups = Array.from(map.values());
 
+    const palette = PALETTES[paletteKey].colors;
     groups.forEach(g => {
-      if (!colColors[g.key]) colColors[g.key] = PALETTE[paletteIdx++ % PALETTE.length];
+      if (!colColors[g.key]) colColors[g.key] = palette[paletteIdx++ % palette.length];
     });
 
     groups.sort((a, b) => {
-      if (a.key === '\x00__empty__') return 1;
+      if (a.key === '\x00__empty__') return  1;
       if (b.key === '\x00__empty__') return -1;
       if (sortMode === 'alpha-asc')  return String(a.label).localeCompare(String(b.label), 'fr');
       if (sortMode === 'alpha-desc') return String(b.label).localeCompare(String(a.label), 'fr');
@@ -517,13 +650,11 @@
       const dotColor    = colColors[group.key] || '#94a3b8';
       const labelTxt    = isEmpty ? '(vide)' : esc(String(group.label));
       const labelCls    = isEmpty ? 'group-label is-empty' : 'group-label';
-      const bodyId      = 'grp-' + btoa(encodeURIComponent(group.key)).replace(/[^a-zA-Z0-9]/g,'');
+      const bodyId      = 'grp-' + btoa(encodeURIComponent(group.key)).replace(/[^a-zA-Z0-9]/g, '');
 
-      // Carte du groupe
       const card = document.createElement('article');
       card.className = 'group' + (isCollapsed ? ' collapsed' : '');
 
-      // En-tête — <button> pour navigation clavier native
       const header = document.createElement('button');
       header.type = 'button';
       header.className = 'group-header';
@@ -539,7 +670,8 @@
         <span class="group-dot" style="background:${dotColor}" aria-hidden="true"></span>
         <span class="${labelCls}">${labelTxt}</span>
         <span class="group-badge"
-              aria-label="${group.records.length} enregistrement${group.records.length > 1 ? 's' : ''}">${group.records.length}</span>`;
+              aria-label="${group.records.length} enregistrement${group.records.length > 1 ? 's' : ''}"
+        >${group.records.length}</span>`;
 
       header.addEventListener('click', () => {
         if (collapsed.has(group.key)) {
@@ -553,7 +685,6 @@
         }
       });
 
-      // Corps
       const body = document.createElement('div');
       body.className = 'group-body';
       body.id = bodyId;
@@ -590,13 +721,13 @@
   function renderCell(val) {
     if (val == null || val === '')
       return '<span class="cell-null" aria-label="valeur vide">—</span>';
-    if (val === true)  return '<span class="cell-bool-t">✓ vrai</span>';
-    if (val === false) return '<span class="cell-bool-f">✗ faux</span>';
+    if (val === true || val === false) {
+      const fmt = BOOL_FORMATS.find(f => f.key === boolFmtKey) || BOOL_FORMATS[0];
+      return val ? fmt.trueHtml : fmt.falseHtml;
+    }
     if (typeof val === 'number') {
-      // Pas de séparateur de milliers pour les entiers à 4 chiffres (années, codes…)
-      const isYear = Number.isInteger(val) && val >= 1000 && val <= 9999;
-      const fmt = isYear ? String(val) : val.toLocaleString('fr-FR');
-      return `<span class="cell-num">${fmt}</span>`;
+      const isYearLike = Number.isInteger(val) && val >= 1000 && val <= 9999;
+      return `<span class="cell-num">${isYearLike ? val : val.toLocaleString('fr-FR')}</span>`;
     }
     if (Array.isArray(val)) return esc(val.join(', '));
     return esc(String(val));
@@ -604,10 +735,10 @@
 
   function esc(s) {
     return String(s)
-      .replace(/&/g,'&amp;')
-      .replace(/</g,'&lt;')
-      .replace(/>/g,'&gt;')
-      .replace(/"/g,'&quot;');
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
   }
 </script>
 </body>
