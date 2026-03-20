@@ -24,6 +24,7 @@
       --shadow:       0 1px 2px rgba(0,0,0,.06), 0 1px 4px rgba(0,0,0,.04);
       --font:         'IBM Plex Sans', system-ui, sans-serif;
       --mono:         'IBM Plex Mono', monospace;
+      --max-group-h:  200px;
     }
 
     html, body {
@@ -259,7 +260,21 @@
       border-top: 1px solid var(--border);
     }
     .group.collapsed .group-body { grid-template-rows: 0fr; border-top-color: transparent; }
-    .group-body-inner { overflow: hidden; }
+    .group-body-inner {
+      overflow: hidden;  /* pour l'animation accordéon */
+    }
+    .group-body-inner .scroll-inner {
+      max-height: var(--max-group-h);
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border-strong) var(--bg);
+    }
+    .group-body-inner .scroll-inner::-webkit-scrollbar       { width: 7px; }
+    .group-body-inner .scroll-inner::-webkit-scrollbar-track { background: var(--bg); }
+    .group-body-inner .scroll-inner::-webkit-scrollbar-thumb {
+      background: var(--border-strong); border-radius: 4px; border: 2px solid var(--bg);
+    }
+    .group-body-inner .scroll-inner::-webkit-scrollbar-thumb:hover { background: var(--muted); }
     /* Arrondi bas sur la dernière ligne du tableau — remplace overflow:hidden du groupe */
     .group-body-inner .rec-table tbody tr:last-child td:first-child {
       border-radius: 0 0 0 calc(var(--radius) - 1px);
@@ -345,6 +360,17 @@
       <div class="color-grid" id="color-grid" aria-labelledby="lbl-colors"></div>
     </div>
 
+    <div>
+      <p class="setting-section-title" id="lbl-maxh">Hauteur max par groupe</p>
+      <div style="display:flex;align-items:center;gap:8px">
+        <input type="range" id="maxh-range" min="80" max="600" step="20" value="200"
+               aria-labelledby="lbl-maxh" style="flex:1;accent-color:var(--accent)">
+        <span id="maxh-val" style="font-family:var(--mono);font-size:11px;color:var(--text);min-width:36px">200px</span>
+        <button class="btn-reset-color" type="button" id="btn-reset-maxh"
+                aria-label="Réinitialiser la hauteur maximale">Réinitialiser</button>
+      </div>
+    </div>
+
     <div id="bool-section" style="display:none">
       <p class="setting-section-title" id="lbl-bool">Affichage vrai / faux</p>
       <div class="bool-row" id="bool-row"
@@ -407,6 +433,7 @@
   let collapsed  = new Set();
   let colColors  = {};       // key → hex, persisté dans grist options
   let boolFmtKey = 'check';
+  let maxGroupH   = 200;
   let paletteIdx = 0;
   let settingsPanelBuilt = false;
 
@@ -455,6 +482,34 @@
   });
 
   // ── Construction du panneau — formats booléens ─────────
+  function applyMaxGroupH() {
+    document.getElementById('app').style.setProperty('--max-group-h', maxGroupH + 'px');
+  }
+
+  function initMaxHSlider() {
+    const range   = document.getElementById('maxh-range');
+    const valSpan = document.getElementById('maxh-val');
+    if (!range) return;
+    range.value = maxGroupH;
+    valSpan.textContent = maxGroupH + 'px';
+    range.addEventListener('input', () => {
+      valSpan.textContent = range.value + 'px';
+    });
+    range.addEventListener('change', () => {
+      maxGroupH = parseInt(range.value);
+      applyMaxGroupH();
+      grist.setOption('maxGroupH', maxGroupH);
+    });
+    document.getElementById('btn-reset-maxh').addEventListener('click', () => {
+      maxGroupH = 200;
+      range.value = 200;
+      valSpan.textContent = '200px';
+      applyMaxGroupH();
+      grist.setOption('maxGroupH', maxGroupH);
+    });
+    applyMaxGroupH();
+  }
+
   function buildBoolButtons() {
     boolRow.innerHTML = '';
     BOOL_FORMATS.forEach(fmt => {
@@ -567,6 +622,9 @@
     if (opts.sortMode)   { sortMode = opts.sortMode; sortSelect.value = sortMode; }
     if (opts.boolFmtKey && BOOL_FORMATS.find(f => f.key === opts.boolFmtKey))
       boolFmtKey = opts.boolFmtKey;
+    if (opts.maxGroupH) {
+      maxGroupH = parseInt(opts.maxGroupH) || 200;
+    }
     if (opts.colColors) {
       try { colColors = JSON.parse(opts.colColors); } catch(e) { colColors = {}; }
     }
@@ -585,6 +643,7 @@
   });
 
   buildBoolButtons();
+  initMaxHSlider();
 
   // ── Sélecteur de colonne ───────────────────────────────
   function rebuildColumnSelect() {
@@ -755,11 +814,11 @@
     const tbody = records.map(rec =>
       `<tr>${cols.map(c => `<td>${renderCell(rec[c])}</td>`).join('')}</tr>`
     ).join('');
-    return `<table class="rec-table">
+    return `<div class="scroll-inner"><table class="rec-table">
       <caption>Groupe : ${esc(groupLabel)}</caption>
       <thead><tr>${thead}</tr></thead>
       <tbody>${tbody}</tbody>
-    </table>`;
+    </table></div>`;
   }
 
   function renderCell(val) {
