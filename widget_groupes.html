@@ -28,15 +28,17 @@
     }
 
     html, body {
-      height: 100%;
-      overflow: hidden;
       margin: 0;
       padding: 0;
+      /* height:0 — empêche Grist de mesurer le document et d'agrandir l'iframe */
+      height: 0;
+      overflow: hidden;
       background: var(--bg);
     }
 
     #app {
-      position: absolute;
+      /* position:fixed retire #app du flux — le document reste à hauteur 0 */
+      position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
       display: flex;
       flex-direction: column;
