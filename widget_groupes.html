@@ -26,38 +26,30 @@
       --mono:         'IBM Plex Mono', monospace;
     }
 
-    html {
-      height: 100%;
-      overflow: hidden;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      height: 100%;
-      overflow: hidden;
+    html, body {
       margin: 0;
       padding: 0;
       background: var(--bg);
     }
 
-    /* position:absolute inset:0 — le seul layout fiable dans une iframe Grist
-       qui redimensionne dynamiquement son contenu */
+    /* Scroll naturel de la page — la toolbar et la statsbar restent visibles en sticky.
+       Grist redimensionne l'iframe au contenu : on ne lutte plus contre ça. */
     #app {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
       display: flex;
       flex-direction: column;
-      overflow: hidden;
       font-family: var(--font);
       color: var(--text);
       font-size: 13px;
       line-height: 1.5;
       background: var(--bg);
+      min-height: 100%;
     }
 
     /* ── Toolbar ── */
     .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -105,6 +97,9 @@
 
     /* ── Panneau de réglages ── */
     .settings-panel {
+      position: sticky;
+      top: 36px;
+      z-index: 9;
       display: none;
       flex-direction: column;
       gap: 12px;
@@ -196,6 +191,9 @@
 
     /* ── Stats bar ── */
     .statsbar {
+      position: sticky;
+      top: var(--sticky-top, 36px);
+      z-index: 8;
       display: none; align-items: center; gap: 12px; padding: 4px 10px;
       background: var(--group-stripe); border-bottom: 1px solid var(--border);
       flex-shrink: 0; font-size: 11px; color: var(--muted);
@@ -203,24 +201,13 @@
     .statsbar.visible { display: flex; }
     .stat-val { font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; }
 
-    /* ── Zone de contenu / scroll ── */
+    /* ── Zone de contenu — scroll naturel de la page ── */
     .content {
-      flex: 1;
-      min-height: 0;
-      overflow-y: auto;
       padding: 8px 10px;
       display: flex;
       flex-direction: column;
       gap: 5px;
-      scrollbar-width: thin;
-      scrollbar-color: var(--border-strong) var(--bg);
     }
-    .content::-webkit-scrollbar       { width: 8px; }
-    .content::-webkit-scrollbar-track { background: var(--bg); border-radius: 4px; }
-    .content::-webkit-scrollbar-thumb {
-      background: var(--border-strong); border-radius: 4px; border: 2px solid var(--bg);
-    }
-    .content::-webkit-scrollbar-thumb:hover { background: var(--muted); }
 
     /* ── Empty state ── */
     .empty {
@@ -235,7 +222,7 @@
     /* ── Groupe ── */
     .group {
       background: var(--surface); border: 1px solid var(--border);
-      border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow);
+      border-radius: var(--radius); box-shadow: var(--shadow);
     }
     .group-header {
       display: flex; align-items: center; gap: 7px; padding: 6px 10px;
@@ -273,6 +260,20 @@
     }
     .group.collapsed .group-body { grid-template-rows: 0fr; border-top-color: transparent; }
     .group-body-inner { overflow: hidden; }
+    /* Arrondi bas sur la dernière ligne du tableau — remplace overflow:hidden du groupe */
+    .group-body-inner .rec-table tbody tr:last-child td:first-child {
+      border-radius: 0 0 0 calc(var(--radius) - 1px);
+    }
+    .group-body-inner .rec-table tbody tr:last-child td:last-child {
+      border-radius: 0 0 calc(var(--radius) - 1px) 0;
+    }
+    /* Arrondi du header selon état */
+    .group-header {
+      border-radius: calc(var(--radius) - 1px) calc(var(--radius) - 1px) 0 0;
+    }
+    .group.collapsed .group-header {
+      border-radius: calc(var(--radius) - 1px);
+    }
 
     /* ── Tableau ── */
     .rec-table { width: 100%; border-collapse: collapse; font-size: 12px; }
@@ -422,6 +423,14 @@
   const colorGrid     = document.getElementById('color-grid');
   const boolRow       = document.getElementById('bool-row');
 
+  // ── Sticky top dynamique ──────────────────────────────
+  function updateStickyTop() {
+    const toolbar = document.querySelector('.toolbar');
+    const panel   = document.getElementById('settings-panel');
+    const h = toolbar.offsetHeight + (panel.classList.contains('open') ? panel.offsetHeight : 0);
+    document.getElementById('app').style.setProperty('--sticky-top', h + 'px');
+  }
+
   // ── Détection colonne booléenne visible ───────────────
   function hasBoolCol() {
     const displayCols = allColumns.filter(c => c !== groupBy);
@@ -442,6 +451,7 @@
     btnSettings.classList.toggle('active', isOpen);
     btnSettings.setAttribute('aria-expanded', String(isOpen));
     if (isOpen) { refreshColorGrid(); refreshBoolSection(); }
+    updateStickyTop();
   });
 
   // ── Construction du panneau — formats booléens ─────────
@@ -735,6 +745,7 @@
       content.appendChild(card);
     });
     refreshBoolSection();
+    updateStickyTop();
   }
 
   function buildTable(cols, records, groupLabel) {
