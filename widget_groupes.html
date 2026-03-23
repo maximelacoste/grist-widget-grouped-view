@@ -413,23 +413,113 @@
     '#ec4899','#06b6d4','#84cc16','#f97316','#6366f1',
   ];
 
-  const BOOL_FORMATS = [
-    { key: 'check', label: '✓ / ✗',
-      t: '<span style="color:#16a34a;font-weight:500">✓ vrai</span>',
-      f: '<span style="color:#dc2626">✗ faux</span>' },
-    { key: 'oui',   label: 'Oui / Non',
-      t: '<span style="color:#16a34a;font-weight:500">Oui</span>',
-      f: '<span style="color:#dc2626">Non</span>' },
-    { key: 'tf',    label: 'True / False',
-      t: '<span style="color:#16a34a;font-weight:500">True</span>',
-      f: '<span style="color:#dc2626">False</span>' },
-    { key: 'badge', label: '● badge',
-      t: '<span style="display:inline-block;padding:1px 7px;border-radius:9px;background:#dcfce7;color:#166534;font-size:10px;font-weight:600">vrai</span>',
-      f: '<span style="display:inline-block;padding:1px 7px;border-radius:9px;background:#fee2e2;color:#991b1b;font-size:10px;font-weight:600">faux</span>' },
-    { key: 'num',   label: '1 / 0',
-      t: '<span class="cell-num">1</span>',
-      f: '<span class="cell-num cell-null">0</span>' },
-  ];
+  // BOOL_FORMATS built after T is defined (see below after I18N)
+  let BOOL_FORMATS = [];
+  function buildBoolFormats() {
+    BOOL_FORMATS = [
+      { key: 'check', label: T.boolLabels[0],
+        t: `<span style="color:#16a34a;font-weight:500">${T.boolTrue[0]}</span>`,
+        f: `<span style="color:#dc2626">${T.boolFalse[0]}</span>` },
+      { key: 'oui',   label: T.boolLabels[1],
+        t: `<span style="color:#16a34a;font-weight:500">${T.boolTrue[1]}</span>`,
+        f: `<span style="color:#dc2626">${T.boolFalse[1]}</span>` },
+      { key: 'tf',    label: T.boolLabels[2],
+        t: `<span style="color:#16a34a;font-weight:500">${T.boolTrue[2]}</span>`,
+        f: `<span style="color:#dc2626">${T.boolFalse[2]}</span>` },
+      { key: 'badge', label: T.boolLabels[3],
+        t: `<span style="display:inline-block;padding:1px 7px;border-radius:9px;background:#dcfce7;color:#166534;font-size:10px;font-weight:600">${T.boolTrue[3]}</span>`,
+        f: `<span style="display:inline-block;padding:1px 7px;border-radius:9px;background:#fee2e2;color:#991b1b;font-size:10px;font-weight:600">${T.boolFalse[3]}</span>` },
+      { key: 'num',   label: T.boolLabels[4],
+        t: '<span class="cell-num">1</span>',
+        f: '<span class="cell-num cell-null">0</span>' },
+    ];
+  }
+  buildBoolFormats();
+
+  // ── Internationalisation ──────────────────────────────
+  const LANG = navigator.language.startsWith('fr') ? 'fr' : 'en';
+
+  const I18N = {
+    fr: {
+      groupBy:          'Grouper par',
+      sortBy:           'Tri',
+      expandAll:        'Tout déplier',
+      collapseAll:      'Tout plier',
+      settingsLabel:    'Réglages d'affichage',
+      chooseCol:        '— choisir —',
+      sortAlphaAsc:     'A → Z',
+      sortAlphaDesc:    'Z → A',
+      sortCountDesc:    'Nb ↓',
+      sortCountAsc:     'Nb ↑',
+      sectionColors:    'Couleurs des groupes',
+      sectionMaxH:      'Hauteur max par groupe',
+      sectionBool:      'Affichage vrai / faux',
+      reset:            'Réinitialiser',
+      noGroups:         'Aucun groupe — choisis une colonne de groupement.',
+      emptyTitle:       'Aucune colonne sélectionnée',
+      emptySub:         'Choisis une colonne dans la barre ci-dessus<br>pour grouper les enregistrements.',
+      emptyTitleNoRec:  'Aucun enregistrement',
+      emptySubNoRec:    'La table sélectionnée ne contient aucun enregistrement.',
+      groups:           'groupes',
+      records:          'enregistrements',
+      record:           'enregistrement',
+      noOtherCol:       'Aucune autre colonne à afficher.',
+      groupCaption:     'Groupe :',
+      emptyGroup:       '(vide)',
+      colorLabel:       'Couleur du groupe',
+      resetColorLabel:  'Réinitialiser la couleur du groupe',
+      resetMaxH:        'Réinitialiser la hauteur maximale',
+      boolFormatLabel:  'Format booléen :',
+      ariaToolbar:      'Options de groupement',
+      ariaSettings:     'Réglages d'affichage',
+      ariaContent:      'Groupes d'enregistrements',
+      ariaGroupRegion:  'Enregistrements — ',
+      ariaColorPicker:  'Couleurs des groupes',
+      boolTrue:  ['✓ vrai',  'Oui',  'True',  'vrai', '1'],
+      boolFalse: ['✗ faux',  'Non',  'False', 'faux', '0'],
+      boolLabels: ['✓ / ✗', 'Oui / Non', 'True / False', '● badge', '1 / 0'],
+    },
+    en: {
+      groupBy:          'Group by',
+      sortBy:           'Sort',
+      expandAll:        'Expand all',
+      collapseAll:      'Collapse all',
+      settingsLabel:    'Display settings',
+      chooseCol:        '— choose —',
+      sortAlphaAsc:     'A → Z',
+      sortAlphaDesc:    'Z → A',
+      sortCountDesc:    'Count ↓',
+      sortCountAsc:     'Count ↑',
+      sectionColors:    'Group colors',
+      sectionMaxH:      'Max height per group',
+      sectionBool:      'True / false display',
+      reset:            'Reset',
+      noGroups:         'No groups — choose a grouping column.',
+      emptyTitle:       'No column selected',
+      emptySub:         'Choose a column in the toolbar above<br>to group records.',
+      emptyTitleNoRec:  'No records',
+      emptySubNoRec:    'The selected table contains no records.',
+      groups:           'groups',
+      records:          'records',
+      record:           'record',
+      noOtherCol:       'No other column to display.',
+      groupCaption:     'Group:',
+      emptyGroup:       '(empty)',
+      colorLabel:       'Color of group',
+      resetColorLabel:  'Reset color of group',
+      resetMaxH:        'Reset maximum height',
+      boolFormatLabel:  'Boolean format:',
+      ariaToolbar:      'Grouping options',
+      ariaSettings:     'Display settings',
+      ariaContent:      'Record groups',
+      ariaGroupRegion:  'Records — ',
+      ariaColorPicker:  'Group colors',
+      boolTrue:  ['✓ true',  'Yes',   'True',  'true',  '1'],
+      boolFalse: ['✗ false', 'No',    'False', 'false', '0'],
+      boolLabels: ['✓ / ✗', 'Yes / No', 'True / False', '● badge', '1 / 0'],
+    }
+  };
+  const T = I18N[LANG];
 
   // ── État ───────────────────────────────────────────────
   let allRecords = [];
@@ -448,8 +538,8 @@
   const sortSelect    = document.getElementById('sort-select');
   const content       = document.getElementById('content');
   const statsbar      = document.getElementById('statsbar');
-  const statGroups    = document.getElementById('stat-groups');
-  const statRecords   = document.getElementById('stat-records');
+  let statGroups    = document.getElementById('stat-groups');
+  let statRecords   = document.getElementById('stat-records');
   const emptyState    = document.getElementById('empty-state');
   const settingsPanel = document.getElementById('settings-panel');
   const btnSettings   = document.getElementById('btn-settings');
@@ -477,6 +567,45 @@
     if (!section) return;
     section.style.display = hasBoolCol() ? '' : 'none';
   }
+
+  // ── Appliquer i18n au DOM statique ───────────────────
+  function applyI18nToDOM() {
+    // Toolbar
+    document.querySelector('label[for="group-select"]').textContent = T.groupBy;
+    document.querySelector('label[for="sort-select"]').textContent  = T.sortBy;
+    document.getElementById('btn-expand').textContent   = T.expandAll;
+    document.getElementById('btn-collapse').textContent = T.collapseAll;
+    document.getElementById('btn-settings').setAttribute('aria-label', T.settingsLabel);
+    // Select options
+    document.querySelector('#group-select option').textContent = T.chooseCol;
+    const sortOpts = document.querySelectorAll('#sort-select option');
+    sortOpts[0].textContent = T.sortAlphaAsc;
+    sortOpts[1].textContent = T.sortAlphaDesc;
+    sortOpts[2].textContent = T.sortCountDesc;
+    sortOpts[3].textContent = T.sortCountAsc;
+    // Settings sections
+    document.getElementById('lbl-colors').textContent = T.sectionColors;
+    document.getElementById('lbl-maxh').textContent   = T.sectionMaxH;
+    document.getElementById('lbl-bool').textContent   = T.sectionBool;
+    document.getElementById('btn-reset-maxh').textContent = T.reset;
+    document.getElementById('btn-reset-maxh').setAttribute('aria-label', T.resetMaxH);
+    // Aria
+    document.querySelector('.toolbar').setAttribute('aria-label', T.ariaToolbar);
+    document.getElementById('settings-panel').setAttribute('aria-label', T.ariaSettings);
+    document.getElementById('content').setAttribute('aria-label', T.ariaContent);
+    // Stats
+    document.getElementById('statsbar').querySelectorAll('span')[0].innerHTML =
+      '<span class="stat-val" id="stat-groups">0</span> ' + T.groups;
+    document.getElementById('statsbar').querySelectorAll('span')[2].innerHTML =
+      '<span class="stat-val" id="stat-records">0</span> ' + T.records;
+    // Empty state
+    document.querySelector('.empty-title').textContent = T.emptyTitle;
+    document.querySelector('.empty-sub').innerHTML     = T.emptySub;
+  }
+  applyI18nToDOM();
+  // Re-grab stat spans after DOM rewrite
+  statGroups  = document.getElementById('stat-groups');
+  statRecords = document.getElementById('stat-records');
 
   // ── Bouton réglages ────────────────────────────────────
   btnSettings.addEventListener('click', () => {
@@ -524,7 +653,7 @@
       btn.className = 'bool-btn' + (fmt.key === boolFmtKey ? ' selected' : '');
       btn.setAttribute('role', 'radio');
       btn.setAttribute('aria-checked', String(fmt.key === boolFmtKey));
-      btn.setAttribute('aria-label', 'Format booléen : ' + fmt.label);
+      btn.setAttribute('aria-label', T.boolFormatLabel + ' ' + fmt.label);
       btn.textContent = fmt.label;
       btn.addEventListener('click', () => {
         boolFmtKey = fmt.key;
@@ -554,7 +683,7 @@
     }
     groups.forEach(group => {
       const isEmpty = group.key === '\x00__empty__';
-      const label   = isEmpty ? '(vide)' : String(group.label);
+      const label   = isEmpty ? T.emptyGroup : String(group.label);
       const color   = colColors[group.key] || DEFAULT_PALETTE[0];
 
       const row = document.createElement('div');
@@ -572,7 +701,7 @@
       const input = document.createElement('input');
       input.type = 'color';
       input.value = color;
-      input.setAttribute('aria-label', 'Couleur du groupe ' + label);
+      input.setAttribute('aria-label', T.colorLabel + ' ' + label);
 
       input.addEventListener('input', () => {
         swatch.style.background = input.value;
@@ -596,8 +725,8 @@
       const resetBtn = document.createElement('button');
       resetBtn.type = 'button';
       resetBtn.className = 'btn-reset-color';
-      resetBtn.textContent = 'Réinitialiser';
-      resetBtn.setAttribute('aria-label', 'Réinitialiser la couleur du groupe ' + label);
+      resetBtn.textContent = T.reset;
+      resetBtn.setAttribute('aria-label', T.resetColorLabel + ' ' + label);
       resetBtn.addEventListener('click', () => {
         const idx = groups.indexOf(group);
         const def = DEFAULT_PALETTE[idx % DEFAULT_PALETTE.length];
@@ -734,11 +863,9 @@
     if (!groupBy || allRecords.length === 0) {
       emptyState.style.display = '';
       emptyState.querySelector('.empty-title').textContent =
-        !groupBy ? 'Aucune colonne sélectionnée' : 'Aucun enregistrement';
+        !groupBy ? T.emptyTitle : T.emptyTitleNoRec;
       emptyState.querySelector('.empty-sub').innerHTML =
-        !groupBy
-          ? 'Choisis une colonne dans la barre ci-dessus<br>pour grouper les enregistrements.'
-          : 'La table sélectionnée ne contient aucun enregistrement.';
+        !groupBy ? T.emptySub : T.emptySubNoRec;
       statsbar.classList.remove('visible');
       return;
     }
@@ -755,7 +882,7 @@
       const isCollapsed = collapsed.has(group.key);
       const isEmpty     = group.key === '\x00__empty__';
       const dotColor    = colColors[group.key] || '#94a3b8';
-      const labelTxt    = isEmpty ? '(vide)' : esc(String(group.label));
+      const labelTxt    = isEmpty ? T.emptyGroup : esc(String(group.label));
       const labelCls    = isEmpty ? 'group-label is-empty' : 'group-label';
       const bodyId      = 'grp-' + btoa(encodeURIComponent(group.key)).replace(/[^a-zA-Z0-9]/g, '');
 
@@ -777,7 +904,7 @@
         <span class="group-dot" style="background:${dotColor}" aria-hidden="true"></span>
         <span class="${labelCls}">${labelTxt}</span>
         <span class="group-badge"
-              aria-label="${group.records.length} enregistrement${group.records.length > 1 ? 's' : ''}"
+              aria-label="${group.records.length} ${group.records.length > 1 ? T.records : T.record}"
         >${group.records.length}</span>`;
 
       header.addEventListener('click', () => {
@@ -796,12 +923,12 @@
       body.className = 'group-body';
       body.id = bodyId;
       body.setAttribute('role', 'region');
-      body.setAttribute('aria-label', 'Enregistrements — ' + labelTxt);
+      body.setAttribute('aria-label', T.ariaGroupRegion + labelTxt);
 
       const inner = document.createElement('div');
       inner.className = 'group-body-inner';
       inner.innerHTML = displayCols.length === 0
-        ? '<p class="only-group-col">Aucune autre colonne à afficher.</p>'
+        ? `<p class="only-group-col">${T.noOtherCol}</p>`
         : buildTable(displayCols, group.records, labelTxt);
 
       body.appendChild(inner);
@@ -821,7 +948,7 @@
       `<tr>${cols.map(c => `<td>${renderCell(rec[c])}</td>`).join('')}</tr>`
     ).join('');
     return `<div class="scroll-inner"><table class="rec-table">
-      <caption>Groupe : ${esc(groupLabel)}</caption>
+      <caption>${T.groupCaption} ${esc(groupLabel)}</caption>
       <thead><tr>${thead}</tr></thead>
       <tbody>${tbody}</tbody>
     </table></div>`;
