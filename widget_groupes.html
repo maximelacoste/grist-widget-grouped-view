@@ -407,16 +407,99 @@
 </div>
 
 <script>
-  // ── Constantes ─────────────────────────────────────────
+  // ── 1. Internationalisation (en premier — tout dépend de T) ──
+  const LANG = navigator.language.startsWith('fr') ? 'fr' : 'en';
+
+  const I18N = {
+    fr: {
+      groupBy:         'Grouper par',
+      sortBy:          'Tri',
+      expandAll:       'Tout déplier',
+      collapseAll:     'Tout plier',
+      settingsLabel:   'Réglages d’affichage',
+      chooseCol:       '— choisir —',
+      sortAlphaAsc:    'A → Z',
+      sortAlphaDesc:   'Z → A',
+      sortCountDesc:   'Nb ↓',
+      sortCountAsc:    'Nb ↑',
+      sectionColors:   'Couleurs des groupes',
+      sectionMaxH:     'Hauteur max par groupe',
+      sectionBool:     'Affichage vrai / faux',
+      reset:           'Réinitialiser',
+      noGroups:        'Aucun groupe — choisis une colonne de groupement.',
+      emptyTitle:      'Aucune colonne sélectionnée',
+      emptySub:        'Choisis une colonne dans la barre ci-dessus<br>pour grouper les enregistrements.',
+      emptyTitleNoRec: 'Aucun enregistrement',
+      emptySubNoRec:   'La table sélectionnée ne contient aucun enregistrement.',
+      groups:          'groupes',
+      records:         'enregistrements',
+      record:          'enregistrement',
+      noOtherCol:      'Aucune autre colonne à afficher.',
+      groupCaption:    'Groupe :',
+      emptyGroup:      '(vide)',
+      colorLabel:      'Couleur du groupe',
+      resetColorLabel: 'Réinitialiser la couleur du groupe',
+      resetMaxH:       'Réinitialiser la hauteur maximale',
+      boolFormatLabel: 'Format booléen :',
+      ariaToolbar:     'Options de groupement',
+      ariaSettings:    'Réglages d’affichage',
+      ariaContent:     'Groupes d’enregistrements',
+      ariaGroupRegion: 'Enregistrements — ',
+      cellEmpty:       'valeur vide',
+      boolTrue:  ['✓ vrai',  'Oui',  'True',  'vrai', '1'],
+      boolFalse: ['✗ faux',  'Non',  'False', 'faux', '0'],
+      boolLabels: ['✓ / ✗', 'Oui / Non', 'True / False', '● badge', '1 / 0'],
+    },
+    en: {
+      groupBy:         'Group by',
+      sortBy:          'Sort',
+      expandAll:       'Expand all',
+      collapseAll:     'Collapse all',
+      settingsLabel:   'Display settings',
+      chooseCol:       '— choose —',
+      sortAlphaAsc:    'A → Z',
+      sortAlphaDesc:   'Z → A',
+      sortCountDesc:   'Count ↓',
+      sortCountAsc:    'Count ↑',
+      sectionColors:   'Group colors',
+      sectionMaxH:     'Max height per group',
+      sectionBool:     'True / false display',
+      reset:           'Reset',
+      noGroups:        'No groups — choose a grouping column.',
+      emptyTitle:      'No column selected',
+      emptySub:        'Choose a column in the toolbar above<br>to group records.',
+      emptyTitleNoRec: 'No records',
+      emptySubNoRec:   'The selected table contains no records.',
+      groups:          'groups',
+      records:         'records',
+      record:          'record',
+      noOtherCol:      'No other column to display.',
+      groupCaption:    'Group:',
+      emptyGroup:      '(empty)',
+      colorLabel:      'Color of group',
+      resetColorLabel: 'Reset color of group',
+      resetMaxH:       'Reset maximum height',
+      boolFormatLabel: 'Boolean format:',
+      ariaToolbar:     'Grouping options',
+      ariaSettings:    'Display settings',
+      ariaContent:     'Record groups',
+      ariaGroupRegion: 'Records — ',
+      cellEmpty:       'empty value',
+      boolTrue:  ['✓ true',  'Yes',   'True',  'true',  '1'],
+      boolFalse: ['✗ false', 'No',    'False', 'false', '0'],
+      boolLabels: ['✓ / ✗', 'Yes / No', 'True / False', '● badge', '1 / 0'],
+    }
+  };
+  const T = I18N[LANG];
+
+  // ── 2. Constantes (utilisent T) ──────────────────────────
   const DEFAULT_PALETTE = [
     '#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6',
     '#ec4899','#06b6d4','#84cc16','#f97316','#6366f1',
   ];
 
-  // BOOL_FORMATS built after T is defined (see below after I18N)
-  let BOOL_FORMATS = [];
-  function buildBoolFormats() {
-    BOOL_FORMATS = [
+  function makeBoolFormats() {
+    return [
       { key: 'check', label: T.boolLabels[0],
         t: `<span style="color:#16a34a;font-weight:500">${T.boolTrue[0]}</span>`,
         f: `<span style="color:#dc2626">${T.boolFalse[0]}</span>` },
@@ -434,217 +517,101 @@
         f: '<span class="cell-num cell-null">0</span>' },
     ];
   }
-  buildBoolFormats();
+  const BOOL_FORMATS = makeBoolFormats();
 
-  // ── Internationalisation ──────────────────────────────
-  const LANG = navigator.language.startsWith('fr') ? 'fr' : 'en';
-
-  const I18N = {
-    fr: {
-      groupBy:          'Grouper par',
-      sortBy:           'Tri',
-      expandAll:        'Tout déplier',
-      collapseAll:      'Tout plier',
-      settingsLabel:    'Réglages d'affichage',
-      chooseCol:        '— choisir —',
-      sortAlphaAsc:     'A → Z',
-      sortAlphaDesc:    'Z → A',
-      sortCountDesc:    'Nb ↓',
-      sortCountAsc:     'Nb ↑',
-      sectionColors:    'Couleurs des groupes',
-      sectionMaxH:      'Hauteur max par groupe',
-      sectionBool:      'Affichage vrai / faux',
-      reset:            'Réinitialiser',
-      noGroups:         'Aucun groupe — choisis une colonne de groupement.',
-      emptyTitle:       'Aucune colonne sélectionnée',
-      emptySub:         'Choisis une colonne dans la barre ci-dessus<br>pour grouper les enregistrements.',
-      emptyTitleNoRec:  'Aucun enregistrement',
-      emptySubNoRec:    'La table sélectionnée ne contient aucun enregistrement.',
-      groups:           'groupes',
-      records:          'enregistrements',
-      record:           'enregistrement',
-      noOtherCol:       'Aucune autre colonne à afficher.',
-      groupCaption:     'Groupe :',
-      emptyGroup:       '(vide)',
-      colorLabel:       'Couleur du groupe',
-      resetColorLabel:  'Réinitialiser la couleur du groupe',
-      resetMaxH:        'Réinitialiser la hauteur maximale',
-      boolFormatLabel:  'Format booléen :',
-      ariaToolbar:      'Options de groupement',
-      ariaSettings:     'Réglages d'affichage',
-      ariaContent:      'Groupes d'enregistrements',
-      ariaGroupRegion:  'Enregistrements — ',
-      ariaColorPicker:  'Couleurs des groupes',
-      boolTrue:  ['✓ vrai',  'Oui',  'True',  'vrai', '1'],
-      boolFalse: ['✗ faux',  'Non',  'False', 'faux', '0'],
-      boolLabels: ['✓ / ✗', 'Oui / Non', 'True / False', '● badge', '1 / 0'],
-    },
-    en: {
-      groupBy:          'Group by',
-      sortBy:           'Sort',
-      expandAll:        'Expand all',
-      collapseAll:      'Collapse all',
-      settingsLabel:    'Display settings',
-      chooseCol:        '— choose —',
-      sortAlphaAsc:     'A → Z',
-      sortAlphaDesc:    'Z → A',
-      sortCountDesc:    'Count ↓',
-      sortCountAsc:     'Count ↑',
-      sectionColors:    'Group colors',
-      sectionMaxH:      'Max height per group',
-      sectionBool:      'True / false display',
-      reset:            'Reset',
-      noGroups:         'No groups — choose a grouping column.',
-      emptyTitle:       'No column selected',
-      emptySub:         'Choose a column in the toolbar above<br>to group records.',
-      emptyTitleNoRec:  'No records',
-      emptySubNoRec:    'The selected table contains no records.',
-      groups:           'groups',
-      records:          'records',
-      record:           'record',
-      noOtherCol:       'No other column to display.',
-      groupCaption:     'Group:',
-      emptyGroup:       '(empty)',
-      colorLabel:       'Color of group',
-      resetColorLabel:  'Reset color of group',
-      resetMaxH:        'Reset maximum height',
-      boolFormatLabel:  'Boolean format:',
-      ariaToolbar:      'Grouping options',
-      ariaSettings:     'Display settings',
-      ariaContent:      'Record groups',
-      ariaGroupRegion:  'Records — ',
-      ariaColorPicker:  'Group colors',
-      boolTrue:  ['✓ true',  'Yes',   'True',  'true',  '1'],
-      boolFalse: ['✗ false', 'No',    'False', 'false', '0'],
-      boolLabels: ['✓ / ✗', 'Yes / No', 'True / False', '● badge', '1 / 0'],
-    }
-  };
-  const T = I18N[LANG];
-
-  // ── État ───────────────────────────────────────────────
+  // ── 3. État ───────────────────────────────────────────────
   let allRecords = [];
   let allColumns = [];
   let groupBy    = '';
   let sortMode   = 'alpha-asc';
   let collapsed  = new Set();
-  let colColors  = {};       // key → hex, persisté dans grist options
+  let colColors  = {};
   let boolFmtKey = 'check';
-  let maxGroupH   = 200;
-  let paletteIdx = 0;
-  let settingsPanelBuilt = false;
+  let maxGroupH  = 200;
 
-  // ── Refs DOM ───────────────────────────────────────────
+  // ── 4. Refs DOM ───────────────────────────────────────────
   const groupSelect   = document.getElementById('group-select');
   const sortSelect    = document.getElementById('sort-select');
   const content       = document.getElementById('content');
   const statsbar      = document.getElementById('statsbar');
-  let statGroups    = document.getElementById('stat-groups');
-  let statRecords   = document.getElementById('stat-records');
   const emptyState    = document.getElementById('empty-state');
   const settingsPanel = document.getElementById('settings-panel');
   const btnSettings   = document.getElementById('btn-settings');
   const colorGrid     = document.getElementById('color-grid');
   const boolRow       = document.getElementById('bool-row');
+  let   statGroups    = document.getElementById('stat-groups');
+  let   statRecords   = document.getElementById('stat-records');
 
-  // ── Sticky top dynamique ──────────────────────────────
-  function updateStickyTop() {
-    const toolbar = document.querySelector('.toolbar');
-    const panel   = document.getElementById('settings-panel');
-    const h = toolbar.offsetHeight + (panel.classList.contains('open') ? panel.offsetHeight : 0);
-    document.getElementById('app').style.setProperty('--sticky-top', h + 'px');
-  }
-
-  // ── Détection colonne booléenne visible ───────────────
-  function hasBoolCol() {
-    const displayCols = allColumns.filter(c => c !== groupBy);
-    return displayCols.some(c =>
-      allRecords.some(r => typeof r[c] === 'boolean')
-    );
-  }
-
-  function refreshBoolSection() {
-    const section = document.getElementById('bool-section');
-    if (!section) return;
-    section.style.display = hasBoolCol() ? '' : 'none';
-  }
-
-  // ── Appliquer i18n au DOM statique ───────────────────
+  // ── 5. Appliquer i18n au DOM statique ─────────────────────
   function applyI18nToDOM() {
-    // Toolbar
     document.querySelector('label[for="group-select"]').textContent = T.groupBy;
     document.querySelector('label[for="sort-select"]').textContent  = T.sortBy;
-    document.getElementById('btn-expand').textContent   = T.expandAll;
-    document.getElementById('btn-collapse').textContent = T.collapseAll;
+    document.getElementById('btn-expand').textContent               = T.expandAll;
+    document.getElementById('btn-collapse').textContent             = T.collapseAll;
     document.getElementById('btn-settings').setAttribute('aria-label', T.settingsLabel);
-    // Select options
-    document.querySelector('#group-select option').textContent = T.chooseCol;
+    document.querySelector('#group-select option').textContent      = T.chooseCol;
     const sortOpts = document.querySelectorAll('#sort-select option');
     sortOpts[0].textContent = T.sortAlphaAsc;
     sortOpts[1].textContent = T.sortAlphaDesc;
     sortOpts[2].textContent = T.sortCountDesc;
     sortOpts[3].textContent = T.sortCountAsc;
-    // Settings sections
-    document.getElementById('lbl-colors').textContent = T.sectionColors;
-    document.getElementById('lbl-maxh').textContent   = T.sectionMaxH;
-    document.getElementById('lbl-bool').textContent   = T.sectionBool;
-    document.getElementById('btn-reset-maxh').textContent = T.reset;
+    document.getElementById('lbl-colors').textContent            = T.sectionColors;
+    document.getElementById('lbl-maxh').textContent              = T.sectionMaxH;
+    document.getElementById('lbl-bool').textContent              = T.sectionBool;
+    document.getElementById('btn-reset-maxh').textContent        = T.reset;
     document.getElementById('btn-reset-maxh').setAttribute('aria-label', T.resetMaxH);
-    // Aria
     document.querySelector('.toolbar').setAttribute('aria-label', T.ariaToolbar);
     document.getElementById('settings-panel').setAttribute('aria-label', T.ariaSettings);
     document.getElementById('content').setAttribute('aria-label', T.ariaContent);
-    // Stats
-    document.getElementById('statsbar').querySelectorAll('span')[0].innerHTML =
-      '<span class="stat-val" id="stat-groups">0</span> ' + T.groups;
-    document.getElementById('statsbar').querySelectorAll('span')[2].innerHTML =
-      '<span class="stat-val" id="stat-records">0</span> ' + T.records;
-    // Empty state
+    // Réécriture des spans de stats (preserve les ids)
+    const statSpans = document.getElementById('statsbar').querySelectorAll(':scope > span');
+    statSpans[0].innerHTML = '<span class="stat-val" id="stat-groups">0</span> ' + T.groups;
+    statSpans[2].innerHTML = '<span class="stat-val" id="stat-records">0</span> ' + T.records;
     document.querySelector('.empty-title').textContent = T.emptyTitle;
     document.querySelector('.empty-sub').innerHTML     = T.emptySub;
   }
   applyI18nToDOM();
-  // Re-grab stat spans after DOM rewrite
   statGroups  = document.getElementById('stat-groups');
   statRecords = document.getElementById('stat-records');
 
-  // ── Bouton réglages ────────────────────────────────────
+  // ── 6. Utilitaires ────────────────────────────────────────
+  function hasBoolCol() {
+    return allColumns.filter(c => c !== groupBy)
+      .some(c => allRecords.some(r => typeof r[c] === 'boolean'));
+  }
+
+  function refreshBoolSection() {
+    const s = document.getElementById('bool-section');
+    if (s) s.style.display = hasBoolCol() ? '' : 'none';
+  }
+
+  function applyMaxGroupH() {
+    document.getElementById('app').style.setProperty('--max-group-h', maxGroupH + 'px');
+  }
+
+  function updateStickyTop() {
+    // No-op (layout is now fixed, kept for compatibility)
+  }
+
+  function saveColors() {
+    grist.setOption('colColors', JSON.stringify(colColors));
+  }
+
+  function esc(s) {
+    return String(s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ── 7. Panneau de réglages — bouton ─────────────────────────
   btnSettings.addEventListener('click', () => {
     const isOpen = settingsPanel.classList.toggle('open');
     btnSettings.classList.toggle('active', isOpen);
     btnSettings.setAttribute('aria-expanded', String(isOpen));
     if (isOpen) { refreshColorGrid(); refreshBoolSection(); }
-    updateStickyTop();
   });
 
-  // ── Construction du panneau — formats booléens ─────────
-  function applyMaxGroupH() {
-    document.getElementById('app').style.setProperty('--max-group-h', maxGroupH + 'px');
-  }
-
-  function initMaxHSlider() {
-    const range   = document.getElementById('maxh-range');
-    const valSpan = document.getElementById('maxh-val');
-    if (!range) return;
-    range.value = maxGroupH;
-    valSpan.textContent = maxGroupH + 'px';
-    range.addEventListener('input', () => {
-      valSpan.textContent = range.value + 'px';
-    });
-    range.addEventListener('change', () => {
-      maxGroupH = parseInt(range.value);
-      applyMaxGroupH();
-      grist.setOption('maxGroupH', maxGroupH);
-    });
-    document.getElementById('btn-reset-maxh').addEventListener('click', () => {
-      maxGroupH = 200;
-      range.value = 200;
-      valSpan.textContent = '200px';
-      applyMaxGroupH();
-      grist.setOption('maxGroupH', maxGroupH);
-    });
-    applyMaxGroupH();
-  }
-
+  // ── 8. Formats booléens ────────────────────────────────────
   function buildBoolButtons() {
     boolRow.innerHTML = '';
     BOOL_FORMATS.forEach(fmt => {
@@ -670,27 +637,26 @@
     });
   }
 
-  // ── Grille de couleurs — une ligne par groupe connu ────
+  // ── 9. Grille de couleurs ─────────────────────────────────
   function refreshColorGrid() {
     colorGrid.innerHTML = '';
     const groups = getGroups();
     if (groups.length === 0) {
       const msg = document.createElement('p');
       msg.style.cssText = 'font-size:11px;color:var(--muted);font-style:italic';
-      msg.textContent = 'Aucun groupe — choisis une colonne de groupement.';
+      msg.textContent = T.noGroups;
       colorGrid.appendChild(msg);
       return;
     }
-    groups.forEach(group => {
+    groups.forEach((group, i) => {
       const isEmpty = group.key === '\x00__empty__';
       const label   = isEmpty ? T.emptyGroup : String(group.label);
-      const color   = colColors[group.key] || DEFAULT_PALETTE[0];
+      const color   = colColors[group.key] || DEFAULT_PALETTE[i % DEFAULT_PALETTE.length];
 
-      const row = document.createElement('div');
+      const row   = document.createElement('div');
       row.className = 'color-row';
 
-      // Pastille + input color
-      const wrap = document.createElement('div');
+      const wrap   = document.createElement('div');
       wrap.className = 'color-input-wrap';
 
       const swatch = document.createElement('span');
@@ -699,42 +665,34 @@
       swatch.setAttribute('aria-hidden', 'true');
 
       const input = document.createElement('input');
-      input.type = 'color';
+      input.type  = 'color';
       input.value = color;
       input.setAttribute('aria-label', T.colorLabel + ' ' + label);
-
-      input.addEventListener('input', () => {
-        swatch.style.background = input.value;
-      });
+      input.addEventListener('input',  () => { swatch.style.background = input.value; });
       input.addEventListener('change', () => {
         colColors[group.key] = input.value;
         swatch.style.background = input.value;
-        saveColors();
-        render();
+        saveColors(); render();
       });
 
       wrap.appendChild(swatch);
       wrap.appendChild(input);
 
-      // Libellé
       const lbl = document.createElement('span');
-      lbl.className = 'color-row-label' + (isEmpty ? ' is-empty' : '');
+      lbl.className   = 'color-row-label' + (isEmpty ? ' is-empty' : '');
       lbl.textContent = label;
 
-      // Bouton reset
       const resetBtn = document.createElement('button');
-      resetBtn.type = 'button';
+      resetBtn.type      = 'button';
       resetBtn.className = 'btn-reset-color';
       resetBtn.textContent = T.reset;
       resetBtn.setAttribute('aria-label', T.resetColorLabel + ' ' + label);
       resetBtn.addEventListener('click', () => {
-        const idx = groups.indexOf(group);
-        const def = DEFAULT_PALETTE[idx % DEFAULT_PALETTE.length];
+        const def = DEFAULT_PALETTE[i % DEFAULT_PALETTE.length];
         colColors[group.key] = def;
         input.value = def;
         swatch.style.background = def;
-        saveColors();
-        render();
+        saveColors(); render();
       });
 
       row.appendChild(wrap);
@@ -744,24 +702,42 @@
     });
   }
 
-  function saveColors() {
-    grist.setOption('colColors', JSON.stringify(colColors));
+  // ── 10. Curseur hauteur max ───────────────────────────────
+  function initMaxHSlider() {
+    const range   = document.getElementById('maxh-range');
+    const valSpan = document.getElementById('maxh-val');
+    if (!range) return;
+    range.value = maxGroupH;
+    valSpan.textContent = maxGroupH + 'px';
+    range.addEventListener('input',  () => { valSpan.textContent = range.value + 'px'; });
+    range.addEventListener('change', () => {
+      maxGroupH = parseInt(range.value);
+      applyMaxGroupH();
+      grist.setOption('maxGroupH', maxGroupH);
+    });
+    document.getElementById('btn-reset-maxh').addEventListener('click', () => {
+      maxGroupH = 200;
+      range.value = 200;
+      valSpan.textContent = '200px';
+      applyMaxGroupH();
+      grist.setOption('maxGroupH', maxGroupH);
+    });
+    applyMaxGroupH();
   }
 
-  // ── Grist ──────────────────────────────────────────────
+  // ── 11. Grist ────────────────────────────────────────────
   grist.ready({ requiredAccess: 'read table' });
 
   grist.onOptions((opts) => {
-    if (!opts) { buildBoolButtons(); return; }
-    if (opts.groupBy)    { groupBy = opts.groupBy; groupSelect.value = groupBy; }
-    if (opts.sortMode)   { sortMode = opts.sortMode; sortSelect.value = sortMode; }
-    if (opts.boolFmtKey && BOOL_FORMATS.find(f => f.key === opts.boolFmtKey))
-      boolFmtKey = opts.boolFmtKey;
-    if (opts.maxGroupH) {
-      maxGroupH = parseInt(opts.maxGroupH) || 200;
-    }
-    if (opts.colColors) {
-      try { colColors = JSON.parse(opts.colColors); } catch(e) { colColors = {}; }
+    if (opts) {
+      if (opts.groupBy)  { groupBy  = opts.groupBy;  groupSelect.value = groupBy;  }
+      if (opts.sortMode) { sortMode = opts.sortMode; sortSelect.value  = sortMode; }
+      if (opts.boolFmtKey && BOOL_FORMATS.find(f => f.key === opts.boolFmtKey))
+        boolFmtKey = opts.boolFmtKey;
+      if (opts.maxGroupH) { maxGroupH = parseInt(opts.maxGroupH) || 200; applyMaxGroupH(); }
+      if (opts.colColors) {
+        try { colColors = JSON.parse(opts.colColors); } catch(e) { colColors = {}; }
+      }
     }
     buildBoolButtons();
     render();
@@ -780,10 +756,10 @@
   buildBoolButtons();
   initMaxHSlider();
 
-  // ── Sélecteur de colonne ───────────────────────────────
+  // ── 12. Sélecteur de colonne ──────────────────────────────
   function rebuildColumnSelect() {
     const prev = groupSelect.value;
-    groupSelect.innerHTML = '<option value="">— choisir —</option>';
+    groupSelect.innerHTML = `<option value="">${T.chooseCol}</option>`;
     allColumns.forEach(col => {
       const opt = document.createElement('option');
       opt.value = col; opt.textContent = col;
@@ -796,7 +772,6 @@
   groupSelect.addEventListener('change', () => {
     groupBy = groupSelect.value;
     collapsed.clear();
-    paletteIdx = 0;
     grist.setOption('groupBy', groupBy);
     render();
     if (settingsPanel.classList.contains('open')) refreshColorGrid();
@@ -824,7 +799,7 @@
     });
   });
 
-  // ── Groupement ─────────────────────────────────────────
+  // ── 13. Groupement ────────────────────────────────────────
   function getGroups() {
     if (!groupBy) return [];
     const map = new Map();
@@ -835,13 +810,9 @@
       map.get(key).records.push(rec);
     });
     const groups = Array.from(map.values());
-
-    // Couleur par défaut si pas encore définie
     groups.forEach((g, i) => {
-      if (!colColors[g.key])
-        colColors[g.key] = DEFAULT_PALETTE[i % DEFAULT_PALETTE.length];
+      if (!colColors[g.key]) colColors[g.key] = DEFAULT_PALETTE[i % DEFAULT_PALETTE.length];
     });
-
     groups.sort((a, b) => {
       if (a.key === '\x00__empty__') return  1;
       if (b.key === '\x00__empty__') return -1;
@@ -854,7 +825,7 @@
     return groups;
   }
 
-  // ── Rendu ──────────────────────────────────────────────
+  // ── 14. Rendu ─────────────────────────────────────────────
   function render() {
     Array.from(content.children).forEach(c => {
       if (c.id !== 'empty-state') c.remove();
@@ -904,7 +875,7 @@
         <span class="group-dot" style="background:${dotColor}" aria-hidden="true"></span>
         <span class="${labelCls}">${labelTxt}</span>
         <span class="group-badge"
-              aria-label="${group.records.length} ${group.records.length > 1 ? T.records : T.record}"
+              aria-label="${group.records.length}\u00a0${group.records.length > 1 ? T.records : T.record}"
         >${group.records.length}</span>`;
 
       header.addEventListener('click', () => {
@@ -937,7 +908,6 @@
       content.appendChild(card);
     });
     refreshBoolSection();
-    updateStickyTop();
   }
 
   function buildTable(cols, records, groupLabel) {
@@ -956,23 +926,17 @@
 
   function renderCell(val) {
     if (val == null || val === '')
-      return '<span class="cell-null" aria-label="valeur vide">—</span>';
+      return `<span class="cell-null" aria-label="${T.cellEmpty}">—</span>`;
     if (val === true || val === false) {
       const fmt = BOOL_FORMATS.find(f => f.key === boolFmtKey) || BOOL_FORMATS[0];
       return val ? fmt.t : fmt.f;
     }
     if (typeof val === 'number') {
       const isYearLike = Number.isInteger(val) && val >= 1000 && val <= 9999;
-      return `<span class="cell-num">${isYearLike ? val : val.toLocaleString('fr-FR')}</span>`;
+      return `<span class="cell-num">${isYearLike ? val : val.toLocaleString(LANG === 'fr' ? 'fr-FR' : 'en-US')}</span>`;
     }
     if (Array.isArray(val)) return esc(val.join(', '));
     return esc(String(val));
-  }
-
-  function esc(s) {
-    return String(s)
-      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 </script>
 </body>
