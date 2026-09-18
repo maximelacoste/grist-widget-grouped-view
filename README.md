@@ -168,38 +168,4 @@ To report a security issue, open an issue or contact the maintainer directly.
 
 ## Licence
 
-MIT- **Expand all / Collapse all** in one click
-- **Group sort** : alphabetical A→Z or Z→A, by record count ascending or descending
-- **Stable color** per group value (rotating palette)
-- **Null values** collected in a *(empty)* group, sorted last
-- **Cell formatting** : booleans ✓/✗, localised numbers, arrays
-- **Persisted options** via `grist.setOption()` (column and sort order survive page reload)
-
-### Setup
-
-1. In your Grist table, add a view → **Custom Widget**
-2. In the right panel, enter the hosted file URL (see below)
-3. Select access level **"Read table"**
-4. Pick a grouping column in the widget toolbar
-
-### Hosting
-
-The widget is a single self-contained HTML file — no npm, no build step.  
-Hosting options:
-
-- **GitHub Pages** : enable Pages on this repo, use `https://<user>.github.io/grist-widget-grouped-view/widget_groupes.html`
-- **Any static HTTP server** (Scalingo, Netlify, public WebDAV…)
-
----
-
-## Fichiers / Files
-
-| Fichier | Description |
-|---|---|
-| `widget_groupes.html` | Widget principal / Main widget file |
-
----
-
-## Licence
-
 MIT
