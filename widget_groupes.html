@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Vue groupée — Grist widget</title>
   <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -15,15 +14,15 @@
       --border:       #e4e4e2;
       --border-strong:#c8c8c5;
       --text:         #18181b;
-      --muted:        #71717a;
+      --muted:        #636369;
       --accent:       #2563eb;
       --group-stripe: #fafaf9;
       --hover-row:    #f0f6ff;
       --focus-ring:   0 0 0 2px rgba(37,99,235,.35);
       --radius:       5px;
       --shadow:       0 1px 2px rgba(0,0,0,.06), 0 1px 4px rgba(0,0,0,.04);
-      --font:         'IBM Plex Sans', system-ui, sans-serif;
-      --mono:         'IBM Plex Mono', monospace;
+      --font:         system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --mono:         ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       --max-group-h:  200px;
     }
 
@@ -141,13 +140,13 @@
     .color-input-wrap {
       position: relative;
       width: 28px;
-      height: 20px;
+      height: 24px;   /* WCAG 2.2 — 2.5.8 */
       flex-shrink: 0;
     }
     .color-swatch {
       display: block;
       width: 28px;
-      height: 20px;
+      height: 24px;
       border-radius: 4px;
       border: 2px solid var(--border-strong);
       cursor: pointer;
@@ -168,6 +167,9 @@
 
     .btn-reset-color {
       font-size: 10px; padding: 1px 6px;
+      /* WCAG 2.2 — 2.5.8 : cible d'au moins 24x24 px */
+      min-height: 24px; min-width: 24px;
+      display: inline-flex; align-items: center; justify-content: center;
       border: 1px solid var(--border-strong); border-radius: var(--radius);
       background: var(--bg); color: var(--muted); cursor: pointer; outline: none;
       transition: background .1s, color .1s; white-space: nowrap; flex-shrink: 0;
@@ -180,6 +182,9 @@
     .bool-row { display: flex; gap: 5px; flex-wrap: wrap; }
     .bool-btn {
       font-family: var(--font); font-size: 11px; padding: 2px 9px;
+      /* WCAG 2.2 — 2.5.8 */
+      min-height: 24px;
+      display: inline-flex; align-items: center;
       border: 1px solid var(--border-strong); border-radius: 10px;
       background: var(--bg); color: var(--muted); cursor: pointer; outline: none;
       transition: background .1s, border-color .1s, color .1s;
@@ -262,12 +267,20 @@
 
     .group-body {
       display: grid; grid-template-rows: 1fr;
-      transition: grid-template-rows .22s cubic-bezier(.4,0,.2,1);
+      transition: grid-template-rows .22s cubic-bezier(.4,0,.2,1), visibility .22s;
       border-top: 1px solid var(--border);
+      visibility: visible;
     }
-    .group.collapsed .group-body { grid-template-rows: 0fr; border-top-color: transparent; }
+    /* visibility:hidden retire aussi le contenu plié de la restitution
+       des lecteurs d'écran, contrairement à overflow:hidden seul */
+    .group.collapsed .group-body {
+      grid-template-rows: 0fr; border-top-color: transparent; visibility: hidden;
+    }
     .group-body-inner {
       overflow: hidden;  /* pour l'animation accordéon */
+    }
+    .group-body-inner .scroll-inner:focus-visible {
+      outline: none; box-shadow: inset 0 0 0 2px var(--accent);
     }
     .group-body-inner .scroll-inner {
       max-height: var(--max-group-h);
@@ -316,6 +329,13 @@
     }
     .rec-table tbody tr:last-child td { border-bottom: none; }
 
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        transition-duration: .01ms !important;
+        animation-duration: .01ms !important;
+      }
+    }
+
     .cell-null { color: var(--muted); font-style: italic; font-size: 11px; }
     .cell-num  { font-family: var(--mono); font-size: 11px; }
     .only-group-col { padding: 8px 12px; font-size: 11px; color: var(--muted); font-style: italic; }
@@ -324,7 +344,7 @@
 <body>
 <div id="app">
 
-  <header class="toolbar" role="toolbar" aria-label="Options de groupement">
+  <header class="toolbar" aria-label="Options de groupement">
     <div class="toolbar-group">
       <label for="group-select">Grouper par</label>
       <select id="group-select">
@@ -385,14 +405,14 @@
 
   </div>
 
-  <div class="statsbar" id="statsbar" role="status" aria-live="polite" aria-atomic="true">
+  <div class="statsbar" id="statsbar" role="status">
     <span><span class="stat-val" id="stat-groups">0</span> groupes</span>
     <span aria-hidden="true">·</span>
     <span><span class="stat-val" id="stat-records">0</span> enregistrements</span>
   </div>
 
   <main class="content" id="content" aria-label="Groupes d'enregistrements">
-    <div class="empty" id="empty-state" role="status">
+    <div class="empty" id="empty-state">
       <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
            stroke="currentColor" stroke-width="1.2"
            aria-hidden="true" focusable="false">
@@ -435,20 +455,20 @@
       records:         'enregistrements',
       record:          'enregistrement',
       noOtherCol:      'Aucune autre colonne à afficher.',
-      groupCaption:    'Groupe :',
+      groupCaption:    'Groupe :',
       emptyGroup:      '(vide)',
       colorLabel:      'Couleur du groupe',
       resetColorLabel: 'Réinitialiser la couleur du groupe',
       resetMaxH:       'Réinitialiser la hauteur maximale',
-      boolFormatLabel: 'Format booléen :',
+      boolFormatLabel: 'Format booléen :',
       ariaToolbar:     'Options de groupement',
       ariaSettings:    'Réglages d’affichage',
       ariaContent:     'Groupes d’enregistrements',
       ariaGroupRegion: 'Enregistrements — ',
       cellEmpty:       'valeur vide',
-      boolTrue:  ['✓ vrai',  'Oui',  'True',  'vrai', '1'],
-      boolFalse: ['✗ faux',  'Non',  'False', 'faux', '0'],
-      boolLabels: ['✓ / ✗', 'Oui / Non', 'True / False', '● badge', '1 / 0'],
+      boolTrue:  ['✓ vrai',  'Oui',  'True',  'vrai', '1'],
+      boolFalse: ['✗ faux',  'Non',  'False', 'faux', '0'],
+      boolLabels: ['✓ / ✗', 'Oui / Non', 'True / False', '● badge', '1 / 0'],
     },
     en: {
       groupBy:         'Group by',
@@ -485,12 +505,13 @@
       ariaContent:     'Record groups',
       ariaGroupRegion: 'Records — ',
       cellEmpty:       'empty value',
-      boolTrue:  ['✓ true',  'Yes',   'True',  'true',  '1'],
-      boolFalse: ['✗ false', 'No',    'False', 'false', '0'],
-      boolLabels: ['✓ / ✗', 'Yes / No', 'True / False', '● badge', '1 / 0'],
+      boolTrue:  ['✓ true',  'Yes',   'True',  'true',  '1'],
+      boolFalse: ['✗ false', 'No',    'False', 'false', '0'],
+      boolLabels: ['✓ / ✗', 'Yes / No', 'True / False', '● badge', '1 / 0'],
     }
   };
   const T = I18N[LANG];
+  document.documentElement.lang = LANG;
 
   // ── 2. Constantes (utilisent T) ──────────────────────────
   const DEFAULT_PALETTE = [
@@ -501,13 +522,13 @@
   function makeBoolFormats() {
     return [
       { key: 'check', label: T.boolLabels[0],
-        t: `<span style="color:#16a34a;font-weight:500">${T.boolTrue[0]}</span>`,
+        t: `<span style="color:#15803d;font-weight:500">${T.boolTrue[0]}</span>`,
         f: `<span style="color:#dc2626">${T.boolFalse[0]}</span>` },
       { key: 'oui',   label: T.boolLabels[1],
-        t: `<span style="color:#16a34a;font-weight:500">${T.boolTrue[1]}</span>`,
+        t: `<span style="color:#15803d;font-weight:500">${T.boolTrue[1]}</span>`,
         f: `<span style="color:#dc2626">${T.boolFalse[1]}</span>` },
       { key: 'tf',    label: T.boolLabels[2],
-        t: `<span style="color:#16a34a;font-weight:500">${T.boolTrue[2]}</span>`,
+        t: `<span style="color:#15803d;font-weight:500">${T.boolTrue[2]}</span>`,
         f: `<span style="color:#dc2626">${T.boolFalse[2]}</span>` },
       { key: 'badge', label: T.boolLabels[3],
         t: `<span style="display:inline-block;padding:1px 7px;border-radius:9px;background:#dcfce7;color:#166534;font-size:10px;font-weight:600">${T.boolTrue[3]}</span>`,
@@ -525,7 +546,9 @@
   let groupBy    = '';
   let sortMode   = 'alpha-asc';
   let collapsed  = new Set();
-  let colColors  = {};
+  // Object.create(null) : pas de prototype, donc pas de clé héritée
+  // (un groupe nommé "constructor" ou "toString" renverrait sinon une fonction native)
+  let colColors  = Object.create(null);
   let boolFmtKey = 'check';
   let maxGroupH  = 200;
 
@@ -565,8 +588,8 @@
     document.getElementById('content').setAttribute('aria-label', T.ariaContent);
     // Réécriture des spans de stats (preserve les ids)
     const statSpans = document.getElementById('statsbar').querySelectorAll(':scope > span');
-    statSpans[0].innerHTML = '<span class="stat-val" id="stat-groups">0</span> ' + T.groups;
-    statSpans[2].innerHTML = '<span class="stat-val" id="stat-records">0</span> ' + T.records;
+    statSpans[0].innerHTML = '<span class="stat-val" id="stat-groups">0</span> ' + T.groups;
+    statSpans[2].innerHTML = '<span class="stat-val" id="stat-records">0</span> ' + T.records;
     document.querySelector('.empty-title').textContent = T.emptyTitle;
     document.querySelector('.empty-sub').innerHTML     = T.emptySub;
   }
@@ -600,7 +623,29 @@
   function esc(s) {
     return String(s)
       .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+      .replace(/'/g,'&#39;').replace(/`/g,'&#96;');
+  }
+
+  // Les couleurs sont interpolées dans un attribut style= construit en innerHTML :
+  // elles doivent être strictement validées, jamais échappées seulement.
+  const HEX_COLOR = /^#[0-9a-f]{6}$/i;
+
+  function safeColor(c, fallback = '#94a3b8') {
+    return (typeof c === 'string' && HEX_COLOR.test(c)) ? c : fallback;
+  }
+
+  // Filtre les options stockées dans le document : seules des couleurs
+  // hexadécimales valides sont conservées, sur un objet sans prototype.
+  function sanitizeColors(raw) {
+    const out = Object.create(null);
+    let obj;
+    try { obj = typeof raw === 'string' ? JSON.parse(raw) : raw; } catch (e) { return out; }
+    if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return out;
+    for (const [k, v] of Object.entries(obj)) {
+      if (typeof v === 'string' && HEX_COLOR.test(v)) out[k] = v;
+    }
+    return out;
   }
 
   // ── 7. Panneau de réglages — bouton ─────────────────────────
@@ -651,7 +696,7 @@
     groups.forEach((group, i) => {
       const isEmpty = group.key === '\x00__empty__';
       const label   = isEmpty ? T.emptyGroup : String(group.label);
-      const color   = colColors[group.key] || DEFAULT_PALETTE[i % DEFAULT_PALETTE.length];
+      const color   = safeColor(colColors[group.key], DEFAULT_PALETTE[i % DEFAULT_PALETTE.length]);
 
       const row   = document.createElement('div');
       row.className = 'color-row';
@@ -734,10 +779,12 @@
       if (opts.sortMode) { sortMode = opts.sortMode; sortSelect.value  = sortMode; }
       if (opts.boolFmtKey && BOOL_FORMATS.find(f => f.key === opts.boolFmtKey))
         boolFmtKey = opts.boolFmtKey;
-      if (opts.maxGroupH) { maxGroupH = parseInt(opts.maxGroupH) || 200; applyMaxGroupH(); }
-      if (opts.colColors) {
-        try { colColors = JSON.parse(opts.colColors); } catch(e) { colColors = {}; }
+      if (opts.maxGroupH) {
+        // bornes identiques à celles du curseur
+        maxGroupH = Math.min(600, Math.max(80, parseInt(opts.maxGroupH) || 200));
+        applyMaxGroupH();
       }
+      if (opts.colColors) colColors = sanitizeColors(opts.colColors);
     }
     buildBoolButtons();
     render();
@@ -849,13 +896,16 @@
     statGroups.textContent  = groups.length;
     statRecords.textContent = allRecords.length;
 
-    groups.forEach(group => {
+    groups.forEach((group, i) => {
       const isCollapsed = collapsed.has(group.key);
       const isEmpty     = group.key === '\x00__empty__';
-      const dotColor    = colColors[group.key] || '#94a3b8';
-      const labelTxt    = isEmpty ? T.emptyGroup : esc(String(group.label));
+      const dotColor    = safeColor(colColors[group.key]);
+      // labelRaw : texte brut, pour setAttribute() et buildTable() qui échappent eux-mêmes
+      // labelTxt : version échappée, pour l'insertion en innerHTML
+      const labelRaw    = isEmpty ? T.emptyGroup : String(group.label);
+      const labelTxt    = esc(labelRaw);
       const labelCls    = isEmpty ? 'group-label is-empty' : 'group-label';
-      const bodyId      = 'grp-' + btoa(encodeURIComponent(group.key)).replace(/[^a-zA-Z0-9]/g, '');
+      const bodyId      = 'grp-' + i;
 
       const card = document.createElement('article');
       card.className = 'group' + (isCollapsed ? ' collapsed' : '');
@@ -894,13 +944,13 @@
       body.className = 'group-body';
       body.id = bodyId;
       body.setAttribute('role', 'region');
-      body.setAttribute('aria-label', T.ariaGroupRegion + labelTxt);
+      body.setAttribute('aria-label', T.ariaGroupRegion + labelRaw);
 
       const inner = document.createElement('div');
       inner.className = 'group-body-inner';
       inner.innerHTML = displayCols.length === 0
         ? `<p class="only-group-col">${T.noOtherCol}</p>`
-        : buildTable(displayCols, group.records, labelTxt);
+        : buildTable(displayCols, group.records, labelRaw);
 
       body.appendChild(inner);
       card.appendChild(header);
@@ -915,13 +965,24 @@
       `<th scope="col" title="${esc(c)}">${esc(c)}</th>`
     ).join('');
     const tbody = records.map(rec =>
-      `<tr>${cols.map(c => `<td>${renderCell(rec[c])}</td>`).join('')}</tr>`
+      `<tr>${cols.map(c => {
+        const t = cellTitle(rec[c]);
+        return `<td${t ? ` title="${esc(t)}"` : ''}>${renderCell(rec[c])}</td>`;
+      }).join('')}</tr>`
     ).join('');
-    return `<div class="scroll-inner"><table class="rec-table">
+    return `<div class="scroll-inner" tabindex="0">
+    <table class="rec-table">
       <caption>${T.groupCaption} ${esc(groupLabel)}</caption>
       <thead><tr>${thead}</tr></thead>
       <tbody>${tbody}</tbody>
     </table></div>`;
+  }
+
+  // Texte brut de la cellule, pour l'attribut title (valeurs tronquées à l'écran)
+  function cellTitle(val) {
+    if (val == null || val === '' || val === true || val === false) return '';
+    if (Array.isArray(val)) return val.join(', ');
+    return String(val);
   }
 
   function renderCell(val) {
