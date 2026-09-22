@@ -1,4 +1,4 @@
-# grist-widget-grouped-view
+# grist-widget-grouped-view 🪗
 
 > Grist custom widget — collapsible grouped view. Groups records by any column with fold/unfold, sort by name or count, stable color per group, and persisted options via `grist.setOption()`.
 
